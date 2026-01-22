@@ -163,6 +163,14 @@ with st.status("A ligar à Tabela de Preços Mestra...", expanded=False) as stat
 st.markdown("### 1. Carregar Dados")
 st.markdown("Faça upload do ficheiro `export.csv` retirado da **Revisão de Preços** do Sifarma.")
 
+# Tutorial em vídeo
+with st.expander("🎥 Ver Tutorial: Como exportar o ficheiro?"):
+    video_file = "ExportarFicheiro.mp4"
+    if os.path.exists(video_file):
+        st.video(video_file)
+    else:
+        st.warning(f"Vídeo '{video_file}' não encontrado na pasta do projeto.")
+
 uploaded_file = st.file_uploader("", type=['csv'], help="Certifique-se que o separador é ';'")
 
 if uploaded_file is not None:
