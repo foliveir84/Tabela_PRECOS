@@ -2,11 +2,43 @@ import streamlit as st
 import pandas as pd
 import re
 import io
+import os
 
 # --- CONFIGURAÇÃO DA PÁGINA ---
 st.set_page_config(page_title="Verificador de Preços", page_icon="💊", layout="wide")
 
 # --- FUNÇÕES AUXILIARES ---
+def get_sheet_url():
+    """
+    Retrieves the Sheet URL from secrets, environment variables, or sidebar input.
+    """
+    sheet_id = None
+    
+    # 1. Try Streamlit Secrets
+    if "GOOGLE_SHEET_ID" in st.secrets:
+        sheet_id = st.secrets["GOOGLE_SHEET_ID"]
+    
+    # 2. Try Environment Variable
+    elif "GOOGLE_SHEET_ID" in os.environ:
+        sheet_id = os.environ["GOOGLE_SHEET_ID"]
+
+    # 3. Fallback: Input in Sidebar (Debug/Manual)
+    if not sheet_id:
+        with st.sidebar:
+            st.warning("⚠️ ID da Google Sheet não configurado.")
+            sheet_id = st.text_input("Introduza o ID da Google Sheet (ou parte 2PACX...):")
+
+    if sheet_id:
+        # Construct URL based on ID type
+        # If it starts with 2PACX, it's a "Published to Web" link
+        if sheet_id.startswith("2PACX"):
+             return f"https://docs.google.com/spreadsheets/d/e/{sheet_id}/pub?output=xlsx"
+        # Otherwise assume standard ID
+        else:
+             return f"https://docs.google.com/spreadsheets/d/{sheet_id}/export?format=xlsx"
+    
+    return None
+
 def normalize_column_name(col_name):
     """Normalizes column names for comparison (lowercase, stripped)."""
     return str(col_name).strip().lower()
@@ -102,8 +134,8 @@ def load_google_sheet_data(url):
 
 st.title("💊 Verificador de Preços Farmácia")
 
-# URL Hardcoded (Tabela Mestra)
-SHEET_URL = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vQrUrwXhW10bnIWJzkTeCXLkrH7zvDh-CMQ-SAbvg2ocLSmBP09qmCpD6dkDf4rbg/pub?output=xlsx'
+# Obter URL dinamicamente (Secrets > Env > Input)
+sheet_url = get_sheet_url()
 
 # Sidebar com Status e Ações
 with st.sidebar:
@@ -112,11 +144,15 @@ with st.sidebar:
         load_google_sheet_data.clear()
         st.rerun()
     st.markdown("---")
-    st.markdown("ℹ️ **Versão:** 1.2")
+    st.markdown("ℹ️ **Versão:** 1.3")
+
+if not sheet_url:
+    st.info("👈 Por favor configure o ID da Google Sheet nas 'Secrets' ou introduza na barra lateral.")
+    st.stop()
 
 # 1. Carregamento da Tabela Mestra (Fundo)
 with st.status("A ligar à Tabela de Preços Mestra...", expanded=False) as status:
-    final_df = load_google_sheet_data(SHEET_URL)
+    final_df = load_google_sheet_data(sheet_url)
     if final_df is not None:
         status.update(label=f"✅ Tabela Mestra Carregada ({len(final_df)} produtos)", state="complete", expanded=False)
     else:
