@@ -1,50 +1,58 @@
 # Project: Tabela_PRECOS
 
 ## Overview
-This project is a Streamlit application designed to fetch, consolidate, and analyze price lists. It merges data from a Google Sheets document (containing "Actual" prices) with an exported CSV file (containing "Current System" prices) to identify discrepancies and missing items.
+This project is a **Streamlit application** designed to help pharmacy staff verify and update product prices. It acts as a bridge between the official price table (hosted on Google Sheets) and the pharmacy's internal system (Sifarma), identifying discrepancies in Cost Prices (PC) and Sales Prices (PVP).
+
+## Key Features
+
+### 1. Data Integration & Performance
+- **Google Sheets**: Fetches the "Master Price Table" securely using a Sheet ID configured via Secrets or Environment Variables.
+- **Smart Caching**: Uses `@st.cache_data` with a 1-hour TTL to prevent repetitive, slow downloads of the Excel file. Includes a manual "Reload" button.
+- **Robust Cleaning**: Handles data type inconsistencies (mixed strings/floats with commas) to ensure no valid price data is lost during processing.
+
+### 2. Analysis & Alerts
+The app compares the Master Table against an uploaded `export.csv` from Sifarma and generates four specific alerts:
+- 🔴 **Critical Cost Alert**: Flags products where the System Cost (PVF) is > 1% higher than the Master Table Cost (PC). *Action: Verify with supplier/Seomara.*
+- ⚠️ **Data Entry Verification**: Flags products where the System PVF is > 5% lower than the Master Table PC. This often indicates the "Preço Líquido" was incorrectly entered into the PVF field. *Action: Confirm manual entry.*
+- 🔵 **PVP Update Action**: Identifies products where the System PVP differs from the Master Table PVP. *Action: Update Sifarma.*
+- 🟡 **Missing Products**: Lists products present in the System but missing from the Master Table. *Action: Request price table addition.*
+
+### 3. User Experience
+- **Video Tutorial**: Embedded "How-to" video (`ExportarFicheiro.mp4`) guiding users on how to export the CSV from Sifarma.
+- **Smart Data Mapping**: Automatically captures the `LÍQ.` column from Sifarma exports when available to assist in discrepancy verification.
+- **Visual Feedback**: Clear color-coded alerts (Red/Yellow/Blue) and dedicated download buttons for each issue type.
 
 ## Security & Deployment
-This application avoids hardcoding sensitive links using **Streamlit Secrets**.
+
+This application is **Cloud-Ready** and avoids hardcoding sensitive links.
 
 ### Local Development
-To run locally, the Google Sheet ID is stored in `.streamlit/secrets.toml`:
+The Google Sheet ID is stored in `.streamlit/secrets.toml` (git-ignored):
 ```toml
 GOOGLE_SHEET_ID = "2PACX-..."
 ```
-*Note: This file is ignored by git to protect your privacy.*
 
 ### Cloud Deployment (Streamlit Community Cloud)
-1. Push your code to GitHub.
-2. Connect your repository to Streamlit Cloud.
-3. In the App Settings, go to **Secrets**.
-4. Add the following key-value pair:
+1. Push the code (including `ExportarFicheiro.mp4`) to GitHub.
+2. In Streamlit Cloud **Settings > Secrets**, add:
    ```toml
    GOOGLE_SHEET_ID = "2PACX-1vQrUrwXhW10bnIWJzkTeCXLkrH7zvDh-CMQ-SAbvg2ocLSmBP09qmCpD6dkDf4rbg"
    ```
-5. Deploy. The app will automatically read this value.
 
-## Features
-- **Google Sheets Integration**: 
-    - Fetches data using the ID configured in Secrets.
-    - **Caching**: Implements `@st.cache_data` (1 hour TTL).
-    - Cleans data: Removes empty rows, standardizes "Codigo" to integer, and prices to float.
-    - **Fixes**: Handles mixed-type columns safely (string conversion before replacement).
+## Project Structure
+- `app.py`: Main application logic.
+- `requirements.txt`: Python dependencies (`streamlit`, `pandas`, `openpyxl`).
+- `.streamlit/secrets.toml`: Local configuration (not in repo).
+- `.gitignore`: Security rules.
+- `ExportarFicheiro.mp4`: Tutorial video asset.
+- `tabela_precos.ipynb`: Development sandbox.
 
-- **CSV Import & Analysis**:
-    - Upload `export.csv` (Sifarma).
-    - Parses CSV with `;` separator.
-
-- **Alerts**:
-    1.  🔴 **Cost Price Alert**: PVF (System) > PC (Sheet) + 1%.
-    2.  🔵 **Sales Price Update**: PVP (Sheet) != PVP (System).
-    3.  🟡 **Missing Products**: Products in System but not in Sheet.
-
-## How to Run
+## How to Run Locally
 1. Install dependencies:
    ```bash
    pip install -r requirements.txt
    ```
-2. Run the Streamlit app:
+2. Run the app:
    ```bash
    streamlit run app.py
    ```

@@ -179,18 +179,30 @@ if uploaded_file is not None:
         csv_df = pd.read_csv(uploaded_file, sep=';', encoding='utf-8') 
         
         # Selecionar apenas colunas relevantes
-        desired_columns = ['CNP', 'DESIGNAÇÃO', 'PVF', 'PVP']
+        required_columns = ['CNP', 'DESIGNAÇÃO', 'PVF', 'PVP']
         
-        if all(col in csv_df.columns for col in desired_columns):
-            csv_df = csv_df[desired_columns]
+        if all(col in csv_df.columns for col in required_columns):
+            # Verificar se existe coluna LÍQ. (opcional mas útil para a validação)
+            has_liq = 'LÍQ.' in csv_df.columns
+            cols_to_keep = required_columns + (['LÍQ.'] if has_liq else [])
+            
+            csv_df = csv_df[cols_to_keep]
             
             # Renomear e limpar
-            csv_df = csv_df.rename(columns={'CNP': 'Codigo', 'PVP': 'PVP_Sifarma', 'PVF': 'PVF_Sifarma'})
+            rename_map = {'CNP': 'Codigo', 'PVP': 'PVP_Sifarma', 'PVF': 'PVF_Sifarma'}
+            if has_liq:
+                rename_map['LÍQ.'] = 'Liq_Sifarma'
+            
+            csv_df = csv_df.rename(columns=rename_map)
             csv_df['Codigo'] = pd.to_numeric(csv_df['Codigo'], errors='coerce')
             csv_df = csv_df.dropna(subset=['Codigo'])
             csv_df['Codigo'] = csv_df['Codigo'].astype(int)
             
-            for col in ['PVF_Sifarma', 'PVP_Sifarma']:
+            cols_to_numeric = ['PVF_Sifarma', 'PVP_Sifarma']
+            if has_liq:
+                cols_to_numeric.append('Liq_Sifarma')
+
+            for col in cols_to_numeric:
                 if csv_df[col].dtype == 'object':
                     csv_df[col] = csv_df[col].str.replace(',', '.', regex=False)
                 csv_df[col] = pd.to_numeric(csv_df[col], errors='coerce')
@@ -202,19 +214,34 @@ if uploaded_file is not None:
             # Merge
             merged_df = pd.merge(final_df, csv_df, on='Codigo', how='inner')
             
-            # --- ALERTA 1: PREÇO DE CUSTO (CRÍTICO) ---
+            # --- ALERTA 1: PREÇO DE CUSTO (CRÍTICO - PVF SUPERIOR) ---
             # PVF > PC Actual * 1.01
             df_custo_alto = merged_df[merged_df['PVF_Sifarma'] > (merged_df['PC Actual'] * 1.01)].copy()
             
             if not df_custo_alto.empty:
                 with st.container():
-                    st.error(f"⚠️ **ALERTA: {len(df_custo_alto)} Produtos com Preço de Custo SUPERIOR ao previsto**")
-                    st.markdown("O Preço de Custo (PVF) no Sifarma é **mais de 1% superior** ao PC da Tabela Mestra. Verifique urgentemente.")
+                    st.error(f"🔴 **ALERTA CRÍTICO: {len(df_custo_alto)} Produtos com PVF SUPERIOR ao previsto**")
+                    st.markdown("O Preço de Custo (PVF) no Sifarma é **mais de 1% superior** ao PC da Tabela Mestra. Prejuízo potencial.")
                     
                     cols_custo = ['Codigo', 'DESIGNAÇÃO', 'PC Actual', 'PVF_Sifarma']
-                    st.dataframe(df_custo_alto[cols_custo], use_container_width=True)
+                    st.dataframe(df_custo_alto[cols_custo], width='stretch', hide_index=True)
+
+            # --- ALERTA 2: POSSÍVEL ERRO TROCA PREÇO (PVF MUITO INFERIOR) ---
+            # PVF < PC Actual * 0.95
+            df_custo_baixo = merged_df[merged_df['PVF_Sifarma'] < (merged_df['PC Actual'] * 0.95)].copy()
+
+            if not df_custo_baixo.empty:
+                with st.container():
+                    st.warning(f"⚠️ **ALERTA DE VERIFICAÇÃO: {len(df_custo_baixo)} Produtos com PVF MUITO INFERIOR (>5%)**")
+                    st.markdown("O PVF no Sifarma é **mais de 5% inferior** ao PC da Tabela. Possível erro de introdução (Troca com Preço Líquido?).")
+                    
+                    cols_show = ['Codigo', 'DESIGNAÇÃO', 'PC Actual', 'PVF_Sifarma']
+                    if 'Liq_Sifarma' in df_custo_baixo.columns:
+                        cols_show.append('Liq_Sifarma')
+                    
+                    st.dataframe(df_custo_baixo[cols_show], width='stretch', hide_index=True)
             
-            # --- ALERTA 2: PVP DESATUALIZADO (AÇÃO) ---
+            # --- ALERTA 3: PVP DESATUALIZADO (AÇÃO) ---
             df_pvp_diff = merged_df[merged_df['PVP Actual'] != round(merged_df['PVP_Sifarma'], 2)].copy()
             
             if not df_pvp_diff.empty:
@@ -222,7 +249,7 @@ if uploaded_file is not None:
                 
                 cols_pvp = ['Codigo', 'DESIGNAÇÃO', 'PVP Actual', 'PVP_Sifarma']
                 # Highlight difference visually implies old vs new
-                st.dataframe(df_pvp_diff[cols_pvp], use_container_width=True)
+                st.dataframe(df_pvp_diff[cols_pvp], width='stretch',hide_index=True)
                 
                 st.download_button(
                     label="📥 Descarregar CSV para Atualização",
@@ -240,7 +267,7 @@ if uploaded_file is not None:
             if not df_missing.empty:
                 with st.expander(f"❓ **{len(df_missing)} Produtos não encontrados na Tabela Mestra**", expanded=True):
                     st.warning("Estes produtos constam no ficheiro do Sifarma mas **não existem** na Tabela Mestra da Google Sheet.")
-                    st.dataframe(df_missing, use_container_width=True)
+                    st.dataframe(df_missing, hide_index=True, width='stretch')
                     
                     # Excel buffer
                     buffer = io.BytesIO()
@@ -255,7 +282,7 @@ if uploaded_file is not None:
                     )
             
         else:
-            st.error(f"❌ O CSV carregado não tem as colunas obrigatórias: {', '.join(desired_columns)}")
+            st.error(f"❌ O CSV carregado não tem as colunas obrigatórias: {', '.join(required_columns)}")
             
     except Exception as e:
         st.error(f"❌ Erro ao processar ficheiro: {e}")
