@@ -334,23 +334,38 @@ with tab_infoprex:
             if diff_pvp.empty:
                 st.success("✅ Todos os produtos correspondidos têm o PVP correto!")
             else:
-                col1, col2 = st.columns([3, 1])
+                col1, col2, col3 = st.columns([2, 0.8, 1.5])
                 with col1:
-                    st.warning(f"⚠️ Encontrados **{len(diff_pvp)}** produtos com PVP diferente da Tabela Master.")
+                    st.warning(f"⚠️ Encontrados **{len(diff_pvp)}** produtos com PVP diferente.")
                 with col2:
                     # Switch for Margin
-                    filter_margin = st.toggle("Apenas Margem > 30%", value=False)
+                    filter_margin = st.toggle("Margem > 30%", value=False)
+                with col3:
+                    # Novo Filtro de Direção do Preço
+                    filter_tipo = st.radio(
+                        "Divergência:",
+                        ["Todas", "Infoprex < Master", "Infoprex > Master"],
+                        horizontal=True,
+                        help="Filtra produtos onde o preço no sistema está abaixo ou acima da tabela mestra."
+                    )
                 
                 # Apply Logic
+                final_view = diff_pvp.copy()
+                
                 if filter_margin:
-                    # Filter: Diff AND Margin > 30
-                    final_view = diff_pvp[diff_pvp['Margem'] > 30.0].copy()
-                    st.info(f"Mostrando **{len(final_view)}** produtos com diferença de preço E Margem > 30%.")
-                    st.caption("Estes produtos têm margem suficiente para estar alinhados com a tabela, mas não estão.")
+                    final_view = final_view[final_view["Margem"] > 30.0]
+                
+                if filter_tipo == "Infoprex < Master":
+                    final_view = final_view[final_view["PVP_Infoprex"] < final_view["PVP Actual"]]
+                    st.info(f"🔍 Mostrando **{len(final_view)}** produtos onde o **PVP Infoprex < Master**.")
+                elif filter_tipo == "Infoprex > Master":
+                    final_view = final_view[final_view["PVP_Infoprex"] > final_view["PVP Actual"]]
+                    st.info(f"🔍 Mostrando **{len(final_view)}** produtos onde o **PVP Infoprex > Master**.")
                 else:
-                    final_view = diff_pvp
-                    st.info("Mostrando **todos** os produtos com diferença de preço (qualquer margem).")
-                    st.caption("Produtos com margem < 30% podem ter preços diferentes justificadamente (compras sem desconto).")
+                    st.info(f"🔍 Mostrando **{len(final_view)}** produtos com divergência de preço.")
+
+                if filter_margin:
+                    st.caption("💡 *Filtro adicional: Apenas produtos com Margem > 30%.*")
                 
                 # Display Dataframe
                 show_cols = ['Codigo', 'NOM', 'PVP Actual', 'PVP_Infoprex', 'Margem']
