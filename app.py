@@ -309,6 +309,13 @@ with tab_infoprex:
             df_infoprex = df_infoprex.dropna(subset=['CPR'])
             df_infoprex['CPR'] = df_infoprex['CPR'].astype(int)
             
+            df_infoprex['SAC'] = pd.to_numeric(df_infoprex['SAC'], errors='coerce')
+            df_infoprex = df_infoprex.dropna(subset=['SAC'])
+            df_infoprex['SAC'] = df_infoprex['SAC'].astype(int)
+            
+            
+            
+            
             # 3. Merge
             # Master: Codigo, PVP Actual, PC Actual
             # Infoprex: CPR, NOM, PVP, Margem
@@ -368,11 +375,12 @@ with tab_infoprex:
                     st.caption("💡 *Filtro adicional: Apenas produtos com Margem > 30%.*")
                 
                 # Display Dataframe
-                show_cols = ['Codigo', 'NOM', 'PVP Actual', 'PVP_Infoprex', 'Margem']
+                show_cols = ['Codigo', 'NOM', 'SAC', 'PVP Actual', 'PVP_Infoprex', 'Margem']
                 
                 # Rename for better display
                 display_df = final_view[show_cols].rename(columns={
                     'NOM': 'Designação',
+                    'SAC': 'Stock',
                     'PVP Actual': 'PVP Master',
                     'PVP_Infoprex': 'PVP Infoprex'
                 })

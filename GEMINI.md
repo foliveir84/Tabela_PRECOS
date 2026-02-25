@@ -27,6 +27,7 @@ Uses the INFOPREX file as the core database skeleton for global price verificati
   - Calculates real margin percentage: `((PVP_net - PCU) / PVP_net) * 100`.
 - **Divergence Logic**:
   - Lists all products where INFOPREX PVP differs from Master Table.
+  - **Price Direction Filter**: Radio buttons to isolate products where system price is either lower (`Infoprex < Master`) or higher (`Infoprex > Master`) than the official table.
   - **High Margin Switch**: Toggle to view only divergences where the margin is > 30% (indicative of products that should be perfectly aligned with the table).
 
 ### 4. User Experience

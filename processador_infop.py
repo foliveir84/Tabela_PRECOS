@@ -43,5 +43,5 @@ def process_data(file_sales):
     df_sales['Margem'] = ((df_sales['PVP_sIVA'] - df_sales['PCU']) / df_sales['PVP_sIVA'] * 100).fillna(0)
 
     # Retornar apenas as colunas desejadas
-    cols_to_return = ['CPR', 'NOM', 'PVP', 'Margem']
+    cols_to_return = ['CPR', 'NOM', 'PVP','SAC', 'Margem']
     return df_sales[cols_to_return].copy()
