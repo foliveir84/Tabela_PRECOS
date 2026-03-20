@@ -41,6 +41,7 @@ def process_data(file_sales):
     # Margem % = (PVPsIVA - PCU) / PVPsIVA
     # Usamos o fillna(0) para evitar problemas onde o PVP_sIVA é zero
     df_sales['Margem'] = ((df_sales['PVP_sIVA'] - df_sales['PCU']) / df_sales['PVP_sIVA'] * 100).fillna(0)
+    df_sales['Margem'] = df_sales['Margem'].round(4)
 
     # Retornar apenas as colunas desejadas
     cols_to_return = ['CPR', 'NOM', 'PVP','SAC', 'Margem']
