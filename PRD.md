@@ -114,7 +114,7 @@ verificador_precos/
 - Toda a análise é stateless por upload — nenhum dado persiste entre reruns além do cache da tabela mestra.
 
 ### 3.5 Design System
-O arquivo `@design_system/design-system.html` contém o design system completo que DEVE ser seguido na renderização da interface. Extraia e reutilize EXATAMENTE:
+O arquivo `design-system.html` contém o design system completo que DEVE ser seguido na renderização da interface. Extraia e reutilize EXATAMENTE:
 - Paleta de cores (backgrounds, textos, acentos, gradientes)
 - Tipografia (fontes, tamanhos, pesos, hierarquia)
 - Componentes de UI (botões, cards, badges, inputs)
@@ -454,8 +454,8 @@ Data injectada em runtime: `datetime.today().strftime('%Y%m%d')`.
 - [ ] Criar estrutura de directorias definitiva conforme §3.1.
 - [ ] Mover lógica existente de `app.py` e `processador_infop.py` para os módulos adequados.
 - [ ] Fixar versões em `requirements.txt`.
-- [ ] Confirmar que `.streamlit/secrets.toml` está no `.gitignore`.
-- [ ] Criar `infoprex_new_system.py` com stub da função `transform_new_system()` para garantir que a interface está definida antes da implementação.
+- [X] Confirmar que `.streamlit/secrets.toml` está no `.gitignore`.
+- [X] Criar `infoprex_new_system.py` com stub da função `transform_new_system()` para garantir que a interface está definida antes da implementação.
 
 ### Fase 1 — Infraestrutura Base
 **Módulos:** `validators.py`, `exporters.py`
@@ -502,7 +502,7 @@ Data injectada em runtime: `datetime.today().strftime('%Y%m%d')`.
 - [ ] FR-UI-01: Auditoria de todos os strings; substituir por equivalentes pt-PT.
 - [ ] Ligar todos os seis alertas Sifarma com os respectivos botões `.xlsx`.
 - [ ] Ligar filtros Infoprex e exportação do estado editado.
-- [ ] FR-SF-09: Verificar que o vídeo tutorial está preservado.
+- [X] FR-SF-09: Verificar que o vídeo tutorial está preservado.
 - [ ] FR-UI-02/03: Validar layout do sidebar e padrão dos botões de download.
 
 ### Fase 6 — QA e Hardening
