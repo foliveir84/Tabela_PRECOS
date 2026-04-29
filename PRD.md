@@ -451,9 +451,9 @@ Data injectada em runtime: `datetime.today().strftime('%Y%m%d')`.
 ## 7. Implementation Plan
 
 ### Fase 0 — Preparação
-- [ ] Criar estrutura de directorias definitiva conforme §3.1.
-- [ ] Mover lógica existente de `app.py` e `processador_infop.py` para os módulos adequados.
-- [ ] Fixar versões em `requirements.txt`.
+- [X] Criar estrutura de directorias definitiva conforme §3.1.
+- [X] Mover lógica existente de `app.py` e `processador_infop.py` para os módulos adequados.
+- [X] Fixar versões em `requirements.txt`.
 - [X] Confirmar que `.streamlit/secrets.toml` está no `.gitignore`.
 - [X] Criar `infoprex_new_system.py` com stub da função `transform_new_system()` para garantir que a interface está definida antes da implementação.
 
