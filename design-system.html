@@ -1,0 +1,650 @@
+<!DOCTYPE html>
+<html lang="en" class="scroll-smooth" style="scroll-behavior: smooth;">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>NexusFlow Design System</title>
+<link rel="preconnect" href="https://fonts.googleapis.com/">
+<link rel="preconnect" href="https://fonts.gstatic.com/" crossorigin="">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500&amp;display=swap" rel="stylesheet">
+<script src="https://cdn.tailwindcss.com/"></script>
+<script src="https://code.iconify.design/iconify-icon/1.0.7/iconify-icon.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/gsap.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/ScrollTrigger.min.js"></script>
+<script>
+tailwind.config = {
+theme: {
+extend: {}
+},
+plugins: [
+function({ addUtilities }) {
+const rotateXUtilities = {};
+const rotateYUtilities = {};
+const rotateZUtilities = {};
+const rotateValues = [0, 5, 10, 15, 20, 30, 45, 75];
+rotateValues.forEach((value) => {
+rotateXUtilities[`.rotate-x-${value}`] = { '--tw-rotate-x': `${value}deg`, transform: `translate3d(var(--tw-translate-x, 0), var(--tw-translate-y, 0), var(--tw-translate-z, 0)) rotateX(var(--tw-rotate-x, 0)) rotateY(var(--tw-rotate-y, 0)) rotateZ(var(--tw-rotate-z, 0)) skewX(var(--tw-skew-x, 0)) skewY(var(--tw-skew-y, 0)) scaleX(var(--tw-scale-x, 1)) scaleY(var(--tw-scale-y, 1))` };
+if (value !== 0) rotateXUtilities[`.-rotate-x-${value}`] = { '--tw-rotate-x': `-${value}deg`, transform: `translate3d(var(--tw-translate-x, 0), var(--tw-translate-y, 0), var(--tw-translate-z, 0)) rotateX(var(--tw-rotate-x, 0)) rotateY(var(--tw-rotate-y, 0)) rotateZ(var(--tw-rotate-z, 0)) skewX(var(--tw-skew-x, 0)) skewY(var(--tw-skew-y, 0)) scaleX(var(--tw-scale-x, 1)) scaleY(var(--tw-scale-y, 1))` };
+});
+rotateValues.forEach((value) => {
+rotateYUtilities[`.rotate-y-${value}`] = { '--tw-rotate-y': `${value}deg`, transform: `translate3d(var(--tw-translate-x, 0), var(--tw-translate-y, 0), var(--tw-translate-z, 0)) rotateX(var(--tw-rotate-x, 0)) rotateY(var(--tw-rotate-y, 0)) rotateZ(var(--tw-rotate-z, 0)) skewX(var(--tw-skew-x, 0)) skewY(var(--tw-skew-y, 0)) scaleX(var(--tw-scale-x, 1)) scaleY(var(--tw-scale-y, 1))` };
+if (value !== 0) rotateYUtilities[`.-rotate-y-${value}`] = { '--tw-rotate-y': `-${value}deg`, transform: `translate3d(var(--tw-translate-x, 0), var(--tw-translate-y, 0), var(--tw-translate-z, 0)) rotateX(var(--tw-rotate-x, 0)) rotateY(var(--tw-rotate-y, 0)) rotateZ(var(--tw-rotate-z, 0)) skewX(var(--tw-skew-x, 0)) skewY(var(--tw-skew-y, 0)) scaleX(var(--tw-scale-x, 1)) scaleY(var(--tw-scale-y, 1))` };
+});
+rotateValues.forEach((value) => {
+rotateZUtilities[`.rotate-z-${value}`] = { '--tw-rotate-z': `${value}deg`, transform: `translate3d(var(--tw-translate-x, 0), var(--tw-translate-y, 0), var(--tw-translate-z, 0)) rotateX(var(--tw-rotate-x, 0)) rotateY(var(--tw-rotate-y, 0)) rotateZ(var(--tw-rotate-z, 0)) skewX(var(--tw-skew-x, 0)) skewY(var(--tw-skew-y, 0)) scaleX(var(--tw-scale-x, 1)) scaleY(var(--tw-scale-y, 1))` };
+if (value !== 0) rotateZUtilities[`.-rotate-z-${value}`] = { '--tw-rotate-z': `-${value}deg`, transform: `translate3d(var(--tw-translate-x, 0), var(--tw-translate-y, 0), var(--tw-translate-z, 0)) rotateX(var(--tw-rotate-x, 0)) rotateY(var(--tw-rotate-y, 0)) rotateZ(var(--tw-rotate-z, 0)) skewX(var(--tw-skew-x, 0)) skewY(var(--tw-skew-y, 0)) scaleX(var(--tw-scale-x, 1)) scaleY(var(--tw-scale-y, 1))` };
+});
+const perspectiveUtilities = { ".perspective-none": { perspective: "none" }, ".perspective-dramatic": { perspective: "100px" }, ".perspective-near": { perspective: "300px" }, ".perspective-normal": { perspective: "500px" }, ".perspective-midrange": { perspective: "800px" }, ".perspective-distant": { perspective: "1200px" } };
+const transformStyleUtilities = { ".transform-style-preserve-3d": { "transform-style": "preserve-3d" }, ".transform-style-flat": { "transform-style": "flat" } };
+addUtilities({ ...rotateXUtilities, ...rotateYUtilities, ...rotateZUtilities, ...perspectiveUtilities, ...transformStyleUtilities });
+}
+]
+};
+</script>
+<script>
+document.addEventListener("DOMContentLoaded", () => {
+gsap.registerPlugin(ScrollTrigger);
+gsap.to(".word-inner", { y: "0%", duration: 1.2, stagger: 0.1, ease: "power4.out", delay: 0.2 });
+gsap.to(".hero-fade", { opacity: 1, y: 0, duration: 1, stagger: 0.2, ease: "power3.out", delay: 0.6 });
+gsap.to(".dashboard-wrapper", { y: -15, rotationX: 10, rotationY: -15, duration: 4, repeat: -1, yoyo: true, ease: "sine.inOut" });
+gsap.fromTo(".typing-line", { opacity: 0, x: -10 }, { scrollTrigger: { trigger: ".code-window", start: "top 85%" }, opacity: 1, x: 0, duration: 0.4, stagger: 0.15, ease: "power2.out" });
+gsap.utils.toArray('.gs-fade-up').forEach(elem => { gsap.fromTo(elem, { y: 50, opacity: 0 }, { scrollTrigger: { trigger: elem, start: "top 85%" }, y: 0, opacity: 1, duration: 1, ease: "power3.out" }); });
+gsap.utils.toArray('.gs-scale-up').forEach(elem => { gsap.fromTo(elem, { scale: 0.95, opacity: 0 }, { scrollTrigger: { trigger: elem, start: "top 85%" }, scale: 1, opacity: 1, duration: 1.2, ease: "expo.out" }); });
+gsap.utils.toArray('.gs-stagger').forEach((elem, i) => { gsap.fromTo(elem, { y: 40, opacity: 0 }, { scrollTrigger: { trigger: elem.parentElement, start: "top 80%" }, y: 0, opacity: 1, duration: 0.8, delay: (i % 3) * 0.1, ease: "power2.out" }); });
+gsap.to(".line-anim", { strokeDashoffset: -20, duration: 1, repeat: -1, ease: "linear" });
+gsap.utils.toArray('.gs-stagger-test').forEach((elem, i) => { const isCenter = elem.classList.contains('center-card'); gsap.fromTo(elem, { y: 60, opacity: 0, scale: 0.9 }, { scrollTrigger: { trigger: elem.parentElement, start: "top 75%" }, y: 0, opacity: 1, scale: isCenter ? 1 : 0.95, duration: 1.2, delay: i * 0.15, ease: "back.out(1.2)" }); });
+});
+</script>
+<style>
+body { font-family: 'Inter', sans-serif; background-color: #0a0a0a; color: #ffffff; overflow-x: hidden; -webkit-font-smoothing: antialiased; -moz-osx-font-smoothing: grayscale; }
+iconify-icon { --iconify-stroke-width: 1.5; display: inline-block; }
+@keyframes driftGlow { 0% { transform: scale(1) translate(0, 0); opacity: 0.1; } 33% { transform: scale(1.1) translate(3%, 3%); opacity: 0.15; } 66% { transform: scale(0.9) translate(-2%, -4%); opacity: 0.12; } 100% { transform: scale(1) translate(0, 0); opacity: 0.1; } }
+.bg-orb { position: absolute; border-radius: 50%; filter: blur(120px); z-index: 0; animation: driftGlow 20s infinite alternate ease-in-out; pointer-events: none; }
+.scene-container { perspective: 2000px; transform-style: preserve-3d; }
+.dashboard-wrapper { transform: rotateX(12deg) rotateY(-18deg) rotateZ(4deg); transform-origin: center center; box-shadow: -20px 40px 100px -10px rgba(0,0,0,0.9), 0 0 40px -10px rgba(249, 115, 22, 0.08); }
+.word-wrapper { display: inline-block; overflow: hidden; vertical-align: bottom; padding-bottom: 0.1em; margin-bottom: -0.1em; }
+.word-inner { display: inline-block; transform: translateY(100%); will-change: transform; }
+.toggle-checkbox:checked { right: 0; border-color: #f97316; }
+.toggle-checkbox:checked + .toggle-label { background-color: #f97316; }
+.toggle-checkbox:checked + .toggle-label:after { transform: translateX(100%); border-color: white; }
+::-webkit-scrollbar { width: 8px; }
+::-webkit-scrollbar-track { background: #0a0a0a; }
+::-webkit-scrollbar-thumb { background: #262626; border-radius: 4px; }
+::-webkit-scrollbar-thumb:hover { background: #404040; }
+.bento-card { background: linear-gradient(180deg, rgba(22, 22, 22, 0.8) 0%, rgba(18, 18, 18, 0.8) 100%); box-shadow: inset 0 1px 1px rgba(255, 255, 255, 0.03); transition: all 0.4s ease; }
+.bento-card:hover { box-shadow: inset 0 1px 1px rgba(255, 255, 255, 0.05), 0 10px 30px -10px rgba(0,0,0,0.5); }
+.perspective-1000 { perspective: 1000px; }
+.animate-float-slow { animation: float-slow 8s ease-in-out infinite; }
+.animate-float-med { animation: float-slow 6s ease-in-out infinite reverse; }
+.animate-float-fast { animation: float-slow 4s ease-in-out infinite; }
+@keyframes float-slow { 0%, 100% { transform: translateY(0) scale(1); } 50% { transform: translateY(-15px) scale(1.02); } }
+.data-particle { position: absolute; width: 6px; height: 6px; background: #f97316; border-radius: 50%; box-shadow: 0 0 15px 2px rgba(249,115,22,0.8); opacity: 0; z-index: 20; }
+.glass-panel { background: linear-gradient(135deg, rgba(30,30,30,0.6) 0%, rgba(15,15,15,0.8) 100%); backdrop-filter: blur(12px); border: 1px solid rgba(255,255,255,0.05); }
+.typing-line { white-space: nowrap; overflow: hidden; display: block; }
+.hero-fade { opacity: 0; transform: translateY(15px); }
+.node-anim { animation: nodeFloat 4s ease-in-out infinite; }
+.node-anim:nth-child(even) { animation-delay: 2s; }
+.node-anim.center-y { animation: nodeFloatCenter 4s ease-in-out infinite; }
+.node-anim.center-y:nth-child(even) { animation-delay: 2s; }
+@keyframes nodeFloat { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-8px); } }
+@keyframes nodeFloatCenter { 0%, 100% { transform: translateY(-50%) translateY(0); } 50% { transform: translateY(-50%) translateY(-8px); } }
+.pan-image { animation: panImage 30s ease-in-out infinite alternate; }
+@keyframes panImage { 0% { object-position: 0% 50%; } 100% { object-position: 100% 50%; } }
+.center-card-rock { animation: subtleRock 8s ease-in-out infinite; }
+@keyframes subtleRock { 0%, 100% { transform: rotate(-1deg) scale(1); } 50% { transform: rotate(1deg) scale(1.02); } }
+.border-pulse-anim { animation: borderPulse 4s infinite; }
+@keyframes borderPulse { 0%, 100% { border-color: rgba(255, 255, 255, 0.05); } 50% { border-color: rgba(249, 115, 22, 0.2); } }
+.radar-ping { position: absolute; top: 50%; left: 50%; width: 100%; height: 100%; transform: translate(-50%, -50%); border-radius: 50%; border: 1px solid rgba(249,115,22,0.8); animation: ping 2s cubic-bezier(0, 0, 0.2, 1) infinite; z-index: -1; pointer-events: none; }
+@keyframes ping { 0% { width: 100%; height: 100%; opacity: 1; } 100% { width: 300%; height: 300%; opacity: 0; } }
+.border-gradient-surface { position: relative; background: rgba(20, 20, 22, 0.8); backdrop-filter: blur(12px); border-radius: 1rem; }
+.border-gradient-surface::before { content: ""; position: absolute; inset: -1px; border-radius: calc(1rem + 1px); background: linear-gradient(135deg, rgba(255,255,255,0.1) 0%, rgba(255,255,255,0.02) 100%); z-index: -1; pointer-events: none; }
+.border-gradient-card { position: relative; background: rgba(24, 24, 27, 0.6); border-radius: 0.75rem; overflow: hidden; }
+.border-gradient-card::before { content: ""; position: absolute; inset: -1px; border-radius: calc(0.75rem + 1px); background: linear-gradient(to bottom right, rgba(255,255,255,0.08), rgba(255,255,255,0)); z-index: -1; }
+.perspective-container { perspective: 2000px; transform-style: preserve-3d; }
+.dashboard-plane { transform: rotateX(38deg) rotateY(-12deg) rotateZ(18deg) scale(0.95); box-shadow: -20px 40px 100px rgba(0,0,0,0.8), 0 0 60px rgba(249, 115, 22, 0.05); }
+</style>
+</head>
+<body class="selection:bg-orange-500/30 selection:text-orange-200 pt-20">
+
+    <!-- Global Fixed Background -->
+    <div class="fixed inset-0 overflow-hidden pointer-events-none z-0">
+      <div class="bg-orb w-[800px] h-[800px] bg-orange-600 top-[-10%] left-[-10%]"></div>
+      <div class="bg-orb w-[600px] h-[600px] bg-neutral-600 bottom-[-10%] right-[-10%]" style="animation-delay: -5s;"></div>
+      <div class="absolute inset-0 bg-[url('data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSI0IiBoZWlnaHQ9IjQiPgo8cmVjdCB3aWR0aD0iNCIgaGVpZ2h0PSI0IiBmaWxsPSIjZmZmIiBmaWxsLW9wYWNpdHk9IjAuMDIiLz4KPC9zdmc+')] opacity-20"></div>
+    </div>
+
+    <!-- System Navigation -->
+    <nav class="fixed top-0 left-0 w-full z-[100] bg-black/80 backdrop-blur-md border-b border-neutral-800 flex justify-center py-4 gap-6 text-sm text-neutral-300">
+        <a href="#0" class="hover:text-white transition-colors">0. Hero</a>
+        <a href="#1" class="hover:text-white transition-colors">1. Tipografia</a>
+        <a href="#2" class="hover:text-white transition-colors">2. Cores e Superfícies</a>
+        <a href="#3" class="hover:text-white transition-colors">3. Componentes de UI</a>
+        <a href="#4" class="hover:text-white transition-colors">4. Layout e Espaçamento</a>
+        <a href="#5" class="hover:text-white transition-colors">5. Motion e Interação</a>
+        <a href="#6" class="hover:text-white transition-colors">6. Ícones</a>
+    </nav>
+
+    <main class="relative z-10 w-full flex flex-col gap-32">
+
+        <!-- Section 0: Hero -->
+        <section id="0" class="pt-10">
+            <div class="max-w-[1400px] mx-auto px-6 mb-8 border-b border-neutral-800 pb-4">
+                <h2 class="text-2xl font-normal text-white">0. Hero (Clone Exato)</h2>
+            </div>
+            
+            <nav class="z-50 flex bg-black/20 w-full max-w-[1400px] border-white/5 border-b mr-auto ml-auto pt-6 pr-6 pb-6 pl-6 relative backdrop-blur-md items-center justify-between">
+              <div class="flex items-center gap-3 text-lg font-normal tracking-tight text-white cursor-pointer group">
+                <div class="w-8 h-8 rounded-lg bg-gradient-to-br from-orange-500 to-orange-700 flex items-center justify-center shadow-[0_0_15px_rgba(249,115,22,0.3)] group-hover:shadow-[0_0_20px_rgba(249,115,22,0.5)] transition-all">
+                  <iconify-icon icon="lucide:layers" class="text-white text-xl"></iconify-icon>
+                </div>
+                <span class="tracking-tight">NexusFlow Design System</span>
+              </div>
+              <div class="hidden md:flex items-center gap-8 text-sm text-neutral-400 font-light">
+                <a href="#1" class="hover:text-white transition-colors">Tipografia</a>
+                <a href="#2" class="hover:text-white transition-colors">Cores</a>
+                <a href="#3" class="hover:text-white transition-colors">Componentes</a>
+                <a href="#4" class="hover:text-white transition-colors">Layout</a>
+              </div>
+              <div class="hidden md:flex items-center gap-4">
+                <button class="px-4 py-2 rounded-full bg-white/5 hover:bg-white/10 border border-white/10 text-white text-sm font-normal transition-all backdrop-blur-sm">
+                  Get Started
+                </button>
+              </div>
+              <button class="md:hidden text-white text-2xl">
+                <iconify-icon icon="lucide:menu"></iconify-icon>
+              </button>
+            </nav>
+
+            <section class="relative z-10 w-full min-h-[90vh] pt-20 pb-32 flex flex-col items-center scene-container overflow-hidden">
+              <div class="max-w-[1400px] w-full mx-auto px-6 flex flex-col items-center">
+                <div class="max-w-3xl flex flex-col items-center text-center mb-20 relative z-20 mx-auto">
+                  <div class="hero-fade inline-flex items-center gap-2 px-3 py-1.5 rounded-full border border-orange-500/30 bg-orange-500/10 text-orange-400 text-sm font-normal mb-6 backdrop-blur-md shadow-[0_0_20px_rgba(249,115,22,0.1)]">
+                    <iconify-icon icon="lucide:wand-2"></iconify-icon>
+                    <span>Design System & Patterns</span>
+                  </div>
+
+                  <h1 class="text-5xl md:text-6xl lg:text-7xl font-normal tracking-tight text-white mb-6 leading-[1.05]">
+                    <span class="word-wrapper"><span class="word-inner">Unify&nbsp;</span></span>
+                    <span class="word-wrapper"><span class="word-inner">your&nbsp;</span></span>
+                    <span class="word-wrapper"><span class="word-inner">UI/UX&nbsp;</span></span>
+                    <span class="word-wrapper"><span class="word-inner">into&nbsp;</span></span>
+                    <span class="word-wrapper"><span class="word-inner">one&nbsp;</span></span>
+                    <span class="word-wrapper"><span class="word-inner">consistent&nbsp;</span></span>
+                    <span class="word-wrapper"><span class="word-inner">library.</span></span>
+                  </h1>
+
+                  <p class="hero-fade text-neutral-400 text-base md:text-lg lg:text-xl mb-8 max-w-xl leading-relaxed font-light">
+                    Bring fragmented UI tools together in a single pattern library. Optimize
+                    development processes and empower your team to scale effortlessly.
+                  </p>
+
+                  <div class="hero-fade flex flex-wrap justify-center items-center gap-4">
+                    <button class="px-6 py-2.5 rounded-full bg-gradient-to-r from-orange-500 to-orange-600 text-white text-base font-normal shadow-[0_0_20px_rgba(249,115,22,0.2)] hover:from-orange-400 hover:to-orange-500 border border-orange-400/50 transition-all">
+                      Explore Components
+                    </button>
+                    <button class="px-6 py-2.5 rounded-full bg-neutral-900/60 border border-neutral-800 text-neutral-300 text-base font-normal hover:bg-neutral-800 transition-all backdrop-blur-md">
+                      View Guidelines
+                    </button>
+                  </div>
+                </div>
+
+                <div class="perspective-container w-full max-w-5xl mx-auto relative z-10 hero-fade">
+                  <div class="dashboard-plane border-gradient-surface w-full aspect-[16/10] flex overflow-hidden">
+                    <!-- Sidebar -->
+                    <div class="w-16 border-r border-white/5 flex flex-col items-center py-6 gap-6 bg-[#0a0a0a]/50">
+                      <div class="w-8 h-8 rounded-lg bg-white/10 flex items-center justify-center mb-4">
+                        <iconify-icon icon="lucide:command" class="text-neutral-300" width="18"></iconify-icon>
+                      </div>
+                      <div class="flex flex-col gap-4">
+                        <a href="#0" class="w-10 h-10 rounded-lg flex items-center justify-center text-orange-500 bg-orange-500/10 relative">
+                          <iconify-icon icon="lucide:layout-grid" width="20"></iconify-icon>
+                          <div class="absolute left-0 top-2 bottom-2 w-0.5 bg-orange-500 rounded-r-full"></div>
+                        </a>
+                        <a href="#0" class="w-10 h-10 rounded-lg flex items-center justify-center text-neutral-500 hover:text-neutral-300 transition">
+                          <iconify-icon icon="lucide:users" width="20"></iconify-icon>
+                        </a>
+                        <a href="#0" class="w-10 h-10 rounded-lg flex items-center justify-center text-neutral-500 hover:text-neutral-300 transition">
+                          <iconify-icon icon="lucide:bar-chart-3" width="20"></iconify-icon>
+                        </a>
+                        <a href="#0" class="w-10 h-10 rounded-lg flex items-center justify-center text-neutral-500 hover:text-neutral-300 transition">
+                          <iconify-icon icon="lucide:settings" width="20"></iconify-icon>
+                        </a>
+                      </div>
+                    </div>
+
+                    <!-- Main Dashboard Area -->
+                    <div class="flex-1 flex flex-col bg-[#111111]/80 backdrop-blur-xl relative">
+                      <div class="absolute top-0 left-0 right-0 h-32 bg-gradient-to-b from-white/[0.02] to-transparent pointer-events-none"></div>
+
+                      <div class="px-8 py-8 border-b border-white/5 flex flex-col sm:flex-row gap-6 justify-between sm:items-center">
+                        <div class="flex justify-between items-center w-full sm:w-auto">
+                          <h2 class="text-xl font-normal tracking-tight text-white flex items-center gap-2">
+                            Connections
+                            <span class="px-2 py-0.5 rounded-md bg-neutral-800/80 border border-neutral-700/50 text-sm font-normal text-neutral-400">
+                              28 total
+                            </span>
+                          </h2>
+                        </div>
+
+                        <div class="relative group w-full sm:w-auto">
+                          <iconify-icon icon="lucide:search" class="absolute left-3 top-1/2 -translate-y-1/2 text-neutral-500 text-base"></iconify-icon>
+                          <input type="text" placeholder="Search apps..." class="w-full sm:w-64 bg-[#161616] border border-neutral-800 rounded-full pl-9 pr-4 py-2 text-sm text-neutral-300 focus:outline-none focus:border-neutral-600 transition-all placeholder:text-neutral-600">
+                        </div>
+                      </div>
+
+                      <div class="flex-1 overflow-y-auto p-8">
+                        <div class="flex flex-wrap gap-2.5 mb-6">
+                          <button class="px-4 py-1.5 rounded-full bg-orange-500/10 text-orange-400 text-sm font-normal border border-orange-500/30">
+                            All
+                          </button>
+                          <button class="px-4 py-1.5 rounded-full bg-[#161616] text-neutral-400 text-sm font-normal border border-neutral-800 hover:text-neutral-200 transition-all">
+                            Active
+                          </button>
+                          <button class="px-4 py-1.5 rounded-full bg-[#161616] text-neutral-400 text-sm font-normal border border-neutral-800 hover:text-neutral-200 transition-all">
+                            Inactive
+                          </button>
+                        </div>
+
+                        <div class="grid grid-cols-1 lg:grid-cols-2 gap-4">
+                          <div class="border-gradient-card p-5 flex flex-col gap-4 hover:border-neutral-600 transition-all group">
+                            <div class="flex items-start justify-between">
+                              <div class="flex items-center gap-3">
+                                <div class="w-10 h-10 rounded-xl bg-neutral-900 border border-neutral-800 flex items-center justify-center text-white">
+                                  <iconify-icon icon="lucide:code-2" class="text-xl"></iconify-icon>
+                                </div>
+                                <div>
+                                  <h4 class="text-base font-normal text-white tracking-tight">CodeHub</h4>
+                                </div>
+                              </div>
+                              <span class="px-2 py-1 rounded-md bg-[#222] border border-neutral-800 text-xs text-neutral-400 font-normal tracking-wide">
+                                DevOps
+                              </span>
+                            </div>
+                            <p class="text-sm text-neutral-500 leading-relaxed font-light">
+                              AI-powered platform that allows developers to create, store, manage and collaborate on code efficiently.
+                            </p>
+                            <div class="mt-auto pt-4 border-t border-neutral-800/60 flex items-center justify-between">
+                              <a href="#0" class="flex items-center gap-1.5 text-sm text-neutral-400 hover:text-white transition-colors">
+                                <iconify-icon icon="lucide:settings" class="text-base"></iconify-icon>
+                                Setup
+                              </a>
+                              <div class="flex items-center gap-2">
+                                <span class="text-sm text-neutral-400 font-normal">Active</span>
+                                <label class="relative inline-flex items-center cursor-pointer">
+                                  <input type="checkbox" class="sr-only toggle-checkbox" checked>
+                                  <div class="toggle-label w-7 h-4 bg-neutral-700 rounded-full relative transition-colors border border-transparent after:content-[''] after:absolute after:top-[1px] after:left-[1px] after:bg-white after:rounded-full after:h-3 after:w-3 after:transition-transform"></div>
+                                </label>
+                              </div>
+                            </div>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </section>
+        </section>
+
+        <!-- Section 1: Tipografia -->
+        <section id="1" class="max-w-[1400px] w-full mx-auto px-6">
+            <div class="mb-12 border-b border-neutral-800 pb-4">
+                <h2 class="text-2xl font-normal text-white">1. Tipografia</h2>
+            </div>
+            <div class="flex flex-col gap-10">
+                <div class="flex flex-col md:flex-row md:items-center justify-between border-b border-neutral-800/50 pb-6">
+                    <div class="text-sm text-neutral-500 w-48 mb-2 md:mb-0">Heading 1</div>
+                    <div class="flex-1">
+                        <h1 class="text-5xl md:text-6xl lg:text-7xl font-normal tracking-tight text-white leading-[1.05]">The quick brown fox</h1>
+                    </div>
+                    <div class="text-sm text-neutral-500 font-mono text-right">text-7xl / 1.05</div>
+                </div>
+                <div class="flex flex-col md:flex-row md:items-center justify-between border-b border-neutral-800/50 pb-6">
+                    <div class="text-sm text-neutral-500 w-48 mb-2 md:mb-0">Heading 2</div>
+                    <div class="flex-1">
+                        <h2 class="text-4xl md:text-5xl font-normal text-white tracking-tight">The quick brown fox</h2>
+                    </div>
+                    <div class="text-sm text-neutral-500 font-mono text-right">text-5xl / normal</div>
+                </div>
+                <div class="flex flex-col md:flex-row md:items-center justify-between border-b border-neutral-800/50 pb-6">
+                    <div class="text-sm text-neutral-500 w-48 mb-2 md:mb-0">Heading 2 (Gradient)</div>
+                    <div class="flex-1">
+                        <h2 class="text-5xl md:text-6xl font-normal text-transparent bg-clip-text bg-gradient-to-r from-white via-white to-white/60 tracking-tight">The quick brown fox</h2>
+                    </div>
+                    <div class="text-sm text-neutral-500 font-mono text-right">text-6xl / gradient</div>
+                </div>
+                <div class="flex flex-col md:flex-row md:items-center justify-between border-b border-neutral-800/50 pb-6">
+                    <div class="text-sm text-neutral-500 w-48 mb-2 md:mb-0">Heading 3</div>
+                    <div class="flex-1">
+                        <h3 class="text-2xl font-normal text-white tracking-tight">The quick brown fox</h3>
+                    </div>
+                    <div class="text-sm text-neutral-500 font-mono text-right">text-2xl / normal</div>
+                </div>
+                <div class="flex flex-col md:flex-row md:items-center justify-between border-b border-neutral-800/50 pb-6">
+                    <div class="text-sm text-neutral-500 w-48 mb-2 md:mb-0">Heading 4</div>
+                    <div class="flex-1">
+                        <h4 class="text-base font-normal text-white tracking-tight">The quick brown fox</h4>
+                    </div>
+                    <div class="text-sm text-neutral-500 font-mono text-right">text-base / normal</div>
+                </div>
+                <div class="flex flex-col md:flex-row md:items-center justify-between border-b border-neutral-800/50 pb-6">
+                    <div class="text-sm text-neutral-500 w-48 mb-2 md:mb-0">Paragraph Large</div>
+                    <div class="flex-1">
+                        <p class="text-lg md:text-xl text-neutral-400 font-light leading-relaxed">The quick brown fox jumps over the lazy dog. Sphinx of black quartz, judge my vow.</p>
+                    </div>
+                    <div class="text-sm text-neutral-500 font-mono text-right">text-xl / relaxed</div>
+                </div>
+                <div class="flex flex-col md:flex-row md:items-center justify-between border-b border-neutral-800/50 pb-6">
+                    <div class="text-sm text-neutral-500 w-48 mb-2 md:mb-0">Paragraph Medium</div>
+                    <div class="flex-1">
+                        <p class="text-base text-neutral-400 font-light max-w-sm">The quick brown fox jumps over the lazy dog.</p>
+                    </div>
+                    <div class="text-sm text-neutral-500 font-mono text-right">text-base / normal</div>
+                </div>
+                <div class="flex flex-col md:flex-row md:items-center justify-between border-b border-neutral-800/50 pb-6">
+                    <div class="text-sm text-neutral-500 w-48 mb-2 md:mb-0">Paragraph Small</div>
+                    <div class="flex-1">
+                        <p class="text-sm text-neutral-500 leading-relaxed font-light">The quick brown fox jumps over the lazy dog.</p>
+                    </div>
+                    <div class="text-sm text-neutral-500 font-mono text-right">text-sm / relaxed</div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Section 2: Cores e Superfícies -->
+        <section id="2" class="max-w-[1400px] w-full mx-auto px-6">
+            <div class="mb-12 border-b border-neutral-800 pb-4">
+                <h2 class="text-2xl font-normal text-white">2. Cores e Superfícies</h2>
+            </div>
+            
+            <h3 class="text-xl font-normal text-white mb-6">Backgrounds & Surfaces</h3>
+            <div class="grid grid-cols-2 md:grid-cols-4 gap-6 mb-12">
+                <div class="flex flex-col gap-2">
+                    <div class="h-24 w-full rounded-xl bg-[#0a0a0a] border border-neutral-800"></div>
+                    <div class="text-sm text-neutral-400">Page Background<br><span class="text-xs text-neutral-500">#0a0a0a</span></div>
+                </div>
+                <div class="flex flex-col gap-2">
+                    <div class="h-24 w-full rounded-xl bg-[#111111]"></div>
+                    <div class="text-sm text-neutral-400">Section Alternate<br><span class="text-xs text-neutral-500">#111111</span></div>
+                </div>
+                <div class="flex flex-col gap-2">
+                    <div class="h-24 w-full rounded-xl bg-[#161616] border border-neutral-800"></div>
+                    <div class="text-sm text-neutral-400">Card / Input<br><span class="text-xs text-neutral-500">#161616</span></div>
+                </div>
+                <div class="flex flex-col gap-2">
+                    <div class="h-24 w-full rounded-xl bg-neutral-900/60 backdrop-blur-md border border-neutral-800"></div>
+                    <div class="text-sm text-neutral-400">Glass Panel<br><span class="text-xs text-neutral-500">bg-neutral-900/60</span></div>
+                </div>
+                <div class="flex flex-col gap-2">
+                    <div class="h-24 w-full rounded-[2rem] bento-card border border-neutral-800/60"></div>
+                    <div class="text-sm text-neutral-400">Bento Card Surface<br><span class="text-xs text-neutral-500">.bento-card</span></div>
+                </div>
+                <div class="flex flex-col gap-2">
+                    <div class="h-24 w-full rounded-xl border-gradient-card"></div>
+                    <div class="text-sm text-neutral-400">Gradient Card<br><span class="text-xs text-neutral-500">.border-gradient-card</span></div>
+                </div>
+            </div>
+
+            <h3 class="text-xl font-normal text-white mb-6">Accents & Gradients</h3>
+            <div class="grid grid-cols-2 md:grid-cols-4 gap-6">
+                <div class="flex flex-col gap-2">
+                    <div class="h-24 w-full rounded-xl bg-orange-500"></div>
+                    <div class="text-sm text-neutral-400">Primary Brand<br><span class="text-xs text-neutral-500">bg-orange-500</span></div>
+                </div>
+                <div class="flex flex-col gap-2">
+                    <div class="h-24 w-full rounded-xl bg-orange-500/10 border border-orange-500/30"></div>
+                    <div class="text-sm text-neutral-400">Primary Subtle<br><span class="text-xs text-neutral-500">bg-orange-500/10</span></div>
+                </div>
+                <div class="flex flex-col gap-2">
+                    <div class="h-24 w-full rounded-xl bg-gradient-to-r from-orange-500 to-orange-600"></div>
+                    <div class="text-sm text-neutral-400">Primary Gradient<br><span class="text-xs text-neutral-500">from-orange-500 to-orange-600</span></div>
+                </div>
+                <div class="flex flex-col gap-2">
+                    <div class="h-24 w-full rounded-xl bg-gradient-to-br from-[#050505] via-[#0a0a0a] to-[#111111]"></div>
+                    <div class="text-sm text-neutral-400">Dark Gradient<br><span class="text-xs text-neutral-500">from-[#050505] via-[#0a0a0a] to-[#111111]</span></div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Section 3: Componentes de UI -->
+        <section id="3" class="max-w-[1400px] w-full mx-auto px-6">
+            <div class="mb-12 border-b border-neutral-800 pb-4">
+                <h2 class="text-2xl font-normal text-white">3. Componentes de UI</h2>
+            </div>
+            
+            <div class="mb-12">
+                <h3 class="text-xl font-normal text-white mb-6">Badges & Pills</h3>
+                <div class="flex flex-wrap gap-6 items-center">
+                    <div class="inline-flex items-center gap-2 px-3 py-1.5 rounded-full border border-orange-500/30 bg-orange-500/10 text-orange-400 text-sm font-normal backdrop-blur-md shadow-[0_0_20px_rgba(249,115,22,0.1)]">
+                        <iconify-icon icon="lucide:wand-2"></iconify-icon>
+                        <span>Primary Pill</span>
+                    </div>
+                    <button class="px-4 py-1.5 rounded-full bg-[#161616] text-neutral-400 text-sm font-normal border border-neutral-800 hover:text-neutral-200 transition-all">
+                        Secondary Pill
+                    </button>
+                    <span class="px-2 py-1 rounded-md bg-[#222] border border-neutral-800 text-xs text-neutral-400 font-normal tracking-wide">
+                        DevOps
+                    </span>
+                    <span class="px-2 py-1 rounded-md bg-orange-500/10 border border-orange-500/20 text-xs text-orange-400 font-normal tracking-wide">
+                        Popular
+                    </span>
+                </div>
+            </div>
+
+            <div class="mb-12">
+                <h3 class="text-xl font-normal text-white mb-6">Buttons</h3>
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
+                    <div class="flex flex-col gap-4 p-6 border border-neutral-800 rounded-xl bg-[#050505]">
+                        <div class="text-sm text-neutral-500 mb-2">Primary Gradient Button</div>
+                        <div class="flex items-center gap-4">
+                            <button class="px-6 py-2.5 rounded-full bg-gradient-to-r from-orange-500 to-orange-600 text-white text-base font-normal shadow-[0_0_20px_rgba(249,115,22,0.2)] hover:from-orange-400 hover:to-orange-500 border border-orange-400/50 transition-all">
+                              Default / Hover
+                            </button>
+                        </div>
+                    </div>
+                    <div class="flex flex-col gap-4 p-6 border border-neutral-800 rounded-xl bg-[#050505]">
+                        <div class="text-sm text-neutral-500 mb-2">Secondary Glass Button</div>
+                        <div class="flex items-center gap-4">
+                            <button class="px-6 py-2.5 rounded-full bg-neutral-900/60 border border-neutral-800 text-neutral-300 text-base font-normal hover:bg-neutral-800 transition-all backdrop-blur-md">
+                              Default / Hover
+                            </button>
+                        </div>
+                    </div>
+                    <div class="flex flex-col gap-4 p-6 border border-neutral-800 rounded-xl bg-[#050505]">
+                        <div class="text-sm text-neutral-500 mb-2">Ghost / Outline Button</div>
+                        <div class="flex items-center gap-4">
+                            <button class="px-4 py-2 rounded-full bg-white/5 hover:bg-white/10 border border-white/10 text-white text-sm font-normal transition-all backdrop-blur-sm">
+                              Default / Hover
+                            </button>
+                        </div>
+                    </div>
+                    <div class="flex flex-col gap-4 p-6 border border-neutral-800 rounded-xl bg-[#050505]">
+                        <div class="text-sm text-neutral-500 mb-2">Large CTA Button</div>
+                        <div class="flex items-center gap-4">
+                            <button class="px-8 py-4 rounded-full bg-white text-black hover:bg-neutral-200 text-base font-medium transition-all shadow-[0_0_30px_rgba(255,255,255,0.15)] hover:shadow-[0_0_40px_rgba(255,255,255,0.25)] flex items-center justify-center gap-2">
+                                Start Building
+                                <iconify-icon icon="lucide:arrow-right" class="text-lg"></iconify-icon>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="mb-12">
+                <h3 class="text-xl font-normal text-white mb-6">Inputs & Controls</h3>
+                <div class="flex flex-wrap gap-12 items-center p-6 border border-neutral-800 rounded-xl bg-[#050505]">
+                    <div class="relative group w-full sm:w-64">
+                        <iconify-icon icon="lucide:search" class="absolute left-3 top-1/2 -translate-y-1/2 text-neutral-500 text-base"></iconify-icon>
+                        <input type="text" placeholder="Search apps..." class="w-full bg-[#161616] border border-neutral-800 rounded-full pl-9 pr-4 py-2 text-sm text-neutral-300 focus:outline-none focus:border-neutral-600 transition-all placeholder:text-neutral-600">
+                    </div>
+                    <div class="flex items-center gap-2">
+                        <span class="text-sm text-neutral-400 font-normal">Active Toggle</span>
+                        <label class="relative inline-flex items-center cursor-pointer">
+                            <input type="checkbox" class="sr-only toggle-checkbox" checked>
+                            <div class="toggle-label w-7 h-4 bg-neutral-700 rounded-full relative transition-colors border border-transparent after:content-[''] after:absolute after:top-[1px] after:left-[1px] after:bg-white after:rounded-full after:h-3 after:w-3 after:transition-transform"></div>
+                        </label>
+                    </div>
+                    <div class="flex items-center gap-2">
+                        <span class="text-sm text-neutral-500 font-normal">Disabled Toggle</span>
+                        <label class="relative inline-flex items-center cursor-pointer">
+                            <input type="checkbox" class="sr-only toggle-checkbox">
+                            <div class="toggle-label w-7 h-4 bg-neutral-800 rounded-full relative transition-colors border border-neutral-700 after:content-[''] after:absolute after:top-[1px] after:left-[1px] after:bg-neutral-500 after:rounded-full after:h-3 after:w-3 after:transition-transform"></div>
+                        </label>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="mb-12">
+                <h3 class="text-xl font-normal text-white mb-6">Cards</h3>
+                <div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
+                    <div class="border-gradient-card p-5 flex flex-col gap-4 hover:border-neutral-600 transition-all group">
+                        <div class="flex items-start justify-between">
+                            <div class="flex items-center gap-3">
+                            <div class="w-10 h-10 rounded-xl bg-neutral-900 border border-neutral-800 flex items-center justify-center text-white">
+                                <iconify-icon icon="lucide:code-2" class="text-xl"></iconify-icon>
+                            </div>
+                            <div>
+                                <h4 class="text-base font-normal text-white tracking-tight">CodeHub</h4>
+                            </div>
+                            </div>
+                            <span class="px-2 py-1 rounded-md bg-[#222] border border-neutral-800 text-xs text-neutral-400 font-normal tracking-wide">DevOps</span>
+                        </div>
+                        <p class="text-sm text-neutral-500 leading-relaxed font-light">AI-powered platform that allows developers to create, store, manage and collaborate on code efficiently.</p>
+                        <div class="mt-auto pt-4 border-t border-neutral-800/60 flex items-center justify-between">
+                            <a href="#0" class="flex items-center gap-1.5 text-sm text-neutral-400 hover:text-white transition-colors">
+                            <iconify-icon icon="lucide:settings" class="text-base"></iconify-icon>
+                            Setup
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Section 4: Layout e Espaçamento -->
+        <section id="4" class="max-w-[1400px] w-full mx-auto px-6">
+            <div class="mb-12 border-b border-neutral-800 pb-4">
+                <h2 class="text-2xl font-normal text-white">4. Layout e Espaçamento</h2>
+            </div>
+            <div class="flex flex-col gap-10">
+                <div>
+                    <h3 class="text-xl font-normal text-white mb-4">Standard Container (max-w-[1400px] px-6)</h3>
+                    <div class="w-full border border-dashed border-neutral-700 bg-neutral-900/30 p-6 rounded-lg text-center text-sm text-neutral-500">
+                        Container Content
+                    </div>
+                </div>
+                <div>
+                    <h3 class="text-xl font-normal text-white mb-4">Narrow Container (max-w-7xl px-6)</h3>
+                    <div class="max-w-7xl mx-auto w-full border border-dashed border-neutral-700 bg-neutral-900/30 p-6 rounded-lg text-center text-sm text-neutral-500">
+                        max-w-7xl
+                    </div>
+                </div>
+                <div>
+                    <h3 class="text-xl font-normal text-white mb-4">Bento Grid Pattern (grid-cols-1 md:grid-cols-3)</h3>
+                    <div class="grid grid-cols-1 md:grid-cols-3 gap-4 auto-rows-[100px]">
+                        <div class="md:col-span-2 border border-neutral-800 bg-[#161616] rounded-2xl flex items-center justify-center text-sm text-neutral-500">Span 2</div>
+                        <div class="md:col-span-1 border border-neutral-800 bg-[#161616] rounded-2xl flex items-center justify-center text-sm text-neutral-500">Span 1</div>
+                        <div class="md:col-span-1 border border-neutral-800 bg-[#161616] rounded-2xl flex items-center justify-center text-sm text-neutral-500">Span 1</div>
+                        <div class="md:col-span-1 border border-neutral-800 bg-[#161616] rounded-2xl flex items-center justify-center text-sm text-neutral-500">Span 1</div>
+                        <div class="md:col-span-1 border border-neutral-800 bg-[#161616] rounded-2xl flex items-center justify-center text-sm text-neutral-500">Span 1</div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Section 5: Motion e Interação -->
+        <section id="5" class="max-w-[1400px] w-full mx-auto px-6">
+            <div class="mb-12 border-b border-neutral-800 pb-4">
+                <h2 class="text-2xl font-normal text-white">5. Motion e Interação</h2>
+            </div>
+            
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+                <div class="p-6 border border-neutral-800 bg-[#050505] rounded-xl flex flex-col items-center justify-center min-h-[250px]">
+                    <div class="w-16 h-16 bg-blue-500/20 border border-blue-500 rounded-xl animate-float-slow flex items-center justify-center text-blue-400 mb-6">
+                        <iconify-icon icon="lucide:server" class="text-2xl"></iconify-icon>
+                    </div>
+                    <div class="text-center text-sm text-neutral-400">.animate-float-slow<br>8s ease-in-out infinite</div>
+                </div>
+
+                <div class="p-6 border border-neutral-800 bg-[#050505] rounded-xl flex flex-col items-center justify-center min-h-[250px]">
+                    <div class="w-16 h-16 bg-green-500/20 border border-green-500 rounded-xl animate-float-med flex items-center justify-center text-green-400 mb-6">
+                        <iconify-icon icon="lucide:database" class="text-2xl"></iconify-icon>
+                    </div>
+                    <div class="text-center text-sm text-neutral-400">.animate-float-med<br>6s ease-in-out infinite reverse</div>
+                </div>
+
+                <div class="p-6 border border-neutral-800 bg-[#050505] rounded-xl flex flex-col items-center justify-center min-h-[250px]">
+                    <div class="w-16 h-16 bg-orange-500/20 border border-orange-500 rounded-xl node-anim flex items-center justify-center text-orange-400 mb-6">
+                        <iconify-icon icon="lucide:cpu" class="text-2xl"></iconify-icon>
+                    </div>
+                    <div class="text-center text-sm text-neutral-400">.node-anim<br>4s ease-in-out infinite</div>
+                </div>
+
+                <div class="p-6 border border-neutral-800 bg-[#050505] rounded-xl flex flex-col items-center justify-center min-h-[250px]">
+                    <div class="relative w-16 h-16 bg-orange-500 rounded-full flex items-center justify-center mb-6">
+                        <div class="radar-ping"></div>
+                        <div class="absolute inset-0 bg-white/20 rounded-full"></div>
+                    </div>
+                    <div class="text-center text-sm text-neutral-400">.radar-ping<br>Ping 2s cubic-bezier</div>
+                </div>
+
+                <div class="p-6 border border-neutral-800 bg-[#050505] rounded-xl flex flex-col items-center justify-center min-h-[250px] border-pulse-anim">
+                    <div class="text-center text-sm text-neutral-400">.border-pulse-anim<br>4s infinite border color transition</div>
+                </div>
+
+                <div class="p-6 border border-neutral-800 bg-[#050505] rounded-xl flex flex-col items-center justify-center min-h-[250px] group cursor-pointer">
+                    <div class="w-16 h-16 bg-neutral-900 border border-neutral-800 rounded-xl flex items-center justify-center text-white group-hover:scale-110 group-hover:text-orange-500 transition-all duration-500 mb-6">
+                        <iconify-icon icon="lucide:arrow-right" class="text-2xl"></iconify-icon>
+                    </div>
+                    <div class="text-center text-sm text-neutral-400">Hover Scale & Color<br>group-hover:scale-110 duration-500</div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Section 6: Ícones -->
+        <section id="6" class="max-w-[1400px] w-full mx-auto px-6 mb-32">
+            <div class="mb-12 border-b border-neutral-800 pb-4">
+                <h2 class="text-2xl font-normal text-white">6. Ícones</h2>
+                <p class="text-sm text-neutral-500 mt-2">Utilizando Iconify (Lucide Icons). Cores herdadas via 'text-currentColor' ou utilitários Tailwind (ex: text-orange-500).</p>
+            </div>
+            
+            <div class="grid grid-cols-4 md:grid-cols-8 gap-6">
+                <div class="flex flex-col items-center gap-3 p-4 border border-neutral-800 bg-[#111] rounded-xl text-neutral-400 hover:text-white transition-colors">
+                    <iconify-icon icon="lucide:layers" class="text-2xl"></iconify-icon>
+                    <span class="text-xs">layers</span>
+                </div>
+                <div class="flex flex-col items-center gap-3 p-4 border border-neutral-800 bg-[#111] rounded-xl text-neutral-400 hover:text-white transition-colors">
+                    <iconify-icon icon="lucide:wand-2" class="text-2xl"></iconify-icon>
+                    <span class="text-xs">wand-2</span>
+                </div>
+                <div class="flex flex-col items-center gap-3 p-4 border border-neutral-800 bg-[#111] rounded-xl text-neutral-400 hover:text-white transition-colors">
+                    <iconify-icon icon="lucide:layout-grid" class="text-2xl"></iconify-icon>
+                    <span class="text-xs">layout-grid</span>
+                </div>
+                <div class="flex flex-col items-center gap-3 p-4 border border-neutral-800 bg-[#111] rounded-xl text-neutral-400 hover:text-white transition-colors">
+                    <iconify-icon icon="lucide:users" class="text-2xl"></iconify-icon>
+                    <span class="text-xs">users</span>
+                </div>
+                <div class="flex flex-col items-center gap-3 p-4 border border-neutral-800 bg-[#111] rounded-xl text-neutral-400 hover:text-white transition-colors">
+                    <iconify-icon icon="lucide:settings" class="text-2xl"></iconify-icon>
+                    <span class="text-xs">settings</span>
+                </div>
+                <div class="flex flex-col items-center gap-3 p-4 border border-neutral-800 bg-[#111] rounded-xl text-neutral-400 hover:text-white transition-colors">
+                    <iconify-icon icon="lucide:bar-chart-2" class="text-2xl"></iconify-icon>
+                    <span class="text-xs">bar-chart-2</span>
+                </div>
+                <div class="flex flex-col items-center gap-3 p-4 border border-neutral-800 bg-[#111] rounded-xl text-neutral-400 hover:text-white transition-colors">
+                    <iconify-icon icon="lucide:zap" class="text-2xl"></iconify-icon>
+                    <span class="text-xs">zap</span>
+                </div>
+                <div class="flex flex-col items-center gap-3 p-4 border border-neutral-800 bg-[#111] rounded-xl text-neutral-400 hover:text-white transition-colors">
+                    <iconify-icon icon="lucide:shield-check" class="text-2xl"></iconify-icon>
+                    <span class="text-xs">shield-check</span>
+                </div>
+            </div>
+        </section>
+
+    </main>
+
+</body>
+</html>
