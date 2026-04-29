@@ -1,76 +1,148 @@
 import pandas as pd
+import infoprex_new_system
 
-def process_data(file_sales):
+def detect_format_and_read(filepath_or_buffer) -> pd.DataFrame:
     """
-    Process Infoprex export data.
+    Detects if the Infoprex file is 'Sistema Antigo' or 'Sistema Novo'.
+    Reads and normalizes the data accordingly.
     """
-    # --- A. VENDAS (INFOPREX) ---
-    file_sales.seek(0)
-    try:
-        df_sales = pd.read_csv(
-            file_sales, sep='\t', encoding='latin-1', on_bad_lines='skip', dtype=str)
-    except:
-        df_sales = pd.read_csv(
-            file_sales, sep=';', encoding='latin-1', on_bad_lines='skip', dtype=str)
+    header_df = None
+    for enc in ['utf-16', 'utf-8', 'latin1']:
+        try:
+            if hasattr(filepath_or_buffer, 'seek'):
+                filepath_or_buffer.seek(0)
+            header_df = pd.read_csv(filepath_or_buffer, sep='\t', encoding=enc, nrows=0)
+            if 'CPR' in header_df.columns:
+                break
+        except Exception:
+            pass
 
-    # 1. Filtro Localização (Data mais recente)
-    if 'DUV' in df_sales.columns and 'LOCALIZACAO' in df_sales.columns:
-        df_sales['DUV_dt'] = pd.to_datetime(
-            df_sales['DUV'], dayfirst=True, format='mixed', errors='coerce')
-        valid = df_sales.dropna(subset=['DUV_dt'])
-        if not valid.empty:
-            max_loc = df_sales.loc[valid['DUV_dt'].idxmax(), 'LOCALIZACAO']
-            df_sales = df_sales[df_sales['LOCALIZACAO'] == max_loc].copy()
+    if header_df is None or 'CPR' not in header_df.columns:
+        for enc in ['utf-16', 'utf-8', 'latin1']:
+            try:
+                if hasattr(filepath_or_buffer, 'seek'):
+                    filepath_or_buffer.seek(0)
+                header_df = pd.read_csv(filepath_or_buffer, sep=';', encoding=enc, nrows=0)
+                if 'CPR' in header_df.columns:
+                    break
+            except Exception:
+                pass
 
-    # 2. Limpeza Numérica (PVP, PCU, IVA e agora SAC para o stock)
+    if header_df is None or 'CPR' not in header_df.columns:
+        return pd.DataFrame()
+
+    is_new_system = 'DUV' in header_df.columns and 'LOCALIZACAO' in header_df.columns
+
+    if is_new_system:
+        if hasattr(filepath_or_buffer, 'seek'):
+            filepath_or_buffer.seek(0)
+        return infoprex_new_system.transform_new_system(filepath_or_buffer)
+    
+    # Legacy parsing
+    df = None
+    for sep in ['\t', ';']:
+        for enc in ['utf-16', 'utf-8', 'latin1']:
+            try:
+                if hasattr(filepath_or_buffer, 'seek'):
+                    filepath_or_buffer.seek(0)
+                df = pd.read_csv(filepath_or_buffer, sep=sep, encoding=enc, on_bad_lines='skip', dtype=str)
+                if not df.empty and 'CPR' in df.columns:
+                    break
+            except Exception:
+                continue
+        if df is not None and not df.empty and 'CPR' in df.columns:
+            break
+
+    if df is None or df.empty:
+        return pd.DataFrame()
+
     for c in ['PVP', 'PCU', 'IVA', 'SAC']:
-        if c in df_sales.columns:
-            # Remove aspas se existirem e troca vírgula por ponto
-            df_sales[c] = df_sales[c].str.replace('"', '', regex=False).str.replace(',', '.', regex=False)
-            df_sales[c] = pd.to_numeric(df_sales[c], errors='coerce').fillna(0.0)
+        if c in df.columns:
+            df[c] = df[c].str.replace('"', '', regex=False).str.replace(',', '.', regex=False)
+            df[c] = pd.to_numeric(df[c], errors='coerce').fillna(0.0)
 
-    # 3. Filtro de Stock (SAC > 0)
-    if 'SAC' in df_sales.columns:
-        df_sales = df_sales[df_sales['SAC'] > 0].copy()
+    rename_dict = {
+        'CPR': 'CNP',
+        'NOM': 'Descrição',
+        'SAC': 'Stock',
+        'PCU': 'PC Atual'
+    }
+    df.rename(columns=rename_dict, inplace=True)
+    
+    return df
 
-    # 4. Cálculo da Margem
-    if 'IVA' in df_sales.columns and 'PVP' in df_sales.columns and 'PCU' in df_sales.columns:
-        df_sales['iva_divisor'] = 1 + (df_sales['IVA'] / 100)
-        df_sales['PVP_sIVA'] = df_sales['PVP'] / df_sales['iva_divisor']
-        df_sales['Margem'] = ((df_sales['PVP_sIVA'] - df_sales['PCU']) / df_sales['PVP_sIVA'] * 100).fillna(0)
-        df_sales['Margem'] = df_sales['Margem'].round(1)
-
-    cols_to_return = ['CPR', 'NOM', 'PVP','SAC', 'Margem']
-    existing_cols = [c for c in cols_to_return if c in df_sales.columns]
-    return df_sales[existing_cols].copy()
-
-def compare_infoprex_master(df_infoprex, final_df):
+def process_infoprex_data(df: pd.DataFrame) -> pd.DataFrame:
     """
-    Compara o DataFrame do Infoprex com a Tabela Mestra (final_df).
+    Applies the Stock > 0 filter and calculates the commercial margin.
     """
-    # 2. Prepare for Merge
-    df_infoprex['CPR'] = pd.to_numeric(df_infoprex['CPR'], errors='coerce')
-    df_infoprex = df_infoprex.dropna(subset=['CPR'])
-    df_infoprex['CPR'] = df_infoprex['CPR'].astype(int)
+    if df.empty:
+        return df
 
-    if 'SAC' in df_infoprex.columns:
-        df_infoprex['SAC'] = pd.to_numeric(df_infoprex['SAC'], errors='coerce')
-        df_infoprex = df_infoprex.dropna(subset=['SAC'])
-        df_infoprex['SAC'] = df_infoprex['SAC'].astype(int)
+    # FR-IP-06: Stock filter
+    if 'Stock' in df.columns:
+        df = df[df['Stock'] > 0].copy()
 
-    # 3. Merge
+    # FR-IP-07: Margin calculation
+    if 'IVA' in df.columns and 'PVP' in df.columns and 'PC Atual' in df.columns:
+        df['iva_divisor'] = 1 + (pd.to_numeric(df['IVA'], errors='coerce').fillna(0) / 100)
+        df['PVP_sIVA'] = pd.to_numeric(df['PVP'], errors='coerce').fillna(0) / df['iva_divisor']
+        pc_atual = pd.to_numeric(df['PC Atual'], errors='coerce').fillna(0)
+        df['Margem'] = ((df['PVP_sIVA'] - pc_atual) / df['PVP_sIVA'].replace(0, pd.NA) * 100).fillna(0)
+        df['Margem'] = pd.to_numeric(df['Margem'], errors='coerce').round(1)
+
+    return df
+
+def apply_ui_filters(df: pd.DataFrame, divergence_type: str, margin_threshold: bool) -> pd.DataFrame:
+    """
+    Applies the UI filters to the divergences DataFrame.
+    """
+    if df.empty:
+        return df
+
+    filtered_df = df.copy()
+
+    # FR-IP-08: UI Filters
+    if divergence_type == 'Infoprex < Master':
+        if 'PVP_Infoprex' in filtered_df.columns and 'PVP Actual' in filtered_df.columns:
+            filtered_df = filtered_df[filtered_df['PVP_Infoprex'] < filtered_df['PVP Actual']]
+    elif divergence_type == 'Infoprex > Master':
+        if 'PVP_Infoprex' in filtered_df.columns and 'PVP Actual' in filtered_df.columns:
+            filtered_df = filtered_df[filtered_df['PVP_Infoprex'] > filtered_df['PVP Actual']]
+
+    if margin_threshold:
+        if 'Margem' in filtered_df.columns:
+            filtered_df = filtered_df[filtered_df['Margem'] > 30]
+
+    return filtered_df
+
+def compare_infoprex_master(df_infoprex: pd.DataFrame, final_df: pd.DataFrame) -> pd.DataFrame:
+    """
+    Compares the Infoprex DataFrame with the Master Table (final_df).
+    """
+    if df_infoprex.empty or final_df.empty:
+        return pd.DataFrame()
+
+    df_infoprex['CNP'] = pd.to_numeric(df_infoprex['CNP'], errors='coerce')
+    df_infoprex = df_infoprex.dropna(subset=['CNP'])
+    df_infoprex['CNP'] = df_infoprex['CNP'].astype(int)
+
+    if 'Stock' in df_infoprex.columns:
+        df_infoprex['Stock'] = pd.to_numeric(df_infoprex['Stock'], errors='coerce')
+        df_infoprex = df_infoprex.dropna(subset=['Stock'])
+        df_infoprex['Stock'] = df_infoprex['Stock'].astype(int)
+
     merged_info = pd.merge(
         final_df,
         df_infoprex,
         left_on='Codigo',
-        right_on='CPR',
+        right_on='CNP',
         how='inner'
     )
 
-    # 4. Filter Differences
-    merged_info['PVP Actual'] = merged_info['PVP Actual'].round(2)
-    merged_info['PVP_Infoprex'] = merged_info['PVP'].round(2)
-
-    diff_pvp = merged_info[merged_info['PVP Actual'] != merged_info['PVP_Infoprex']].copy()
+    if 'PVP Actual' in merged_info.columns and 'PVP' in merged_info.columns:
+        merged_info['PVP Actual'] = pd.to_numeric(merged_info['PVP Actual'], errors='coerce').fillna(0).round(2)
+        merged_info['PVP_Infoprex'] = pd.to_numeric(merged_info['PVP'], errors='coerce').fillna(0).round(2)
+        diff_pvp = merged_info[merged_info['PVP Actual'] != merged_info['PVP_Infoprex']].copy()
+        return diff_pvp
     
-    return diff_pvp
+    return merged_info

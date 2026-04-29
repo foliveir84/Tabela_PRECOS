@@ -460,41 +460,41 @@ Data injectada em runtime: `datetime.today().strftime('%Y%m%d')`.
 ### Fase 1 — Infraestrutura Base
 **Módulos:** `validators.py`, `exporters.py`
 
-- [ ] Implementar `validators.py`: `is_valid_price()`, `to_float_safe()`, `to_int_safe()`.
-- [ ] Implementar `exporters.py`: função centralizada `to_excel_bytes()`.
-- [ ] Definir a convenção de naming de ficheiros de export com datas.
+- [X] Implementar `validators.py`: `is_valid_price()`, `to_float_safe()`, `to_int_safe()`.
+- [X] Implementar `exporters.py`: função centralizada `to_excel_bytes()`.
+- [X] Definir a convenção de naming de ficheiros de export com datas.
 
 ### Fase 2 — Tabela Mestra e Motor de Validação
 **Módulo:** `google_sheets.py`
 
-- [ ] FR-GS-01: Construção de URL (dois formatos de ID).
-- [ ] FR-GS-02/03: Validação por aba (A1 = 'CNP') e matching flexível de colunas.
-- [ ] FR-GS-04/05: Consolidação e captura de valores inválidos (sem `dropna` silencioso).
-- [ ] FR-GS-06: Captura da data de última actualização via HTTP headers.
+- [X] FR-GS-01: Construção de URL (dois formatos de ID).
+- [X] FR-GS-02/03: Validação por aba (A1 = 'CNP') e matching flexível de colunas.
+- [X] FR-GS-04/05: Consolidação e captura de valores inválidos (sem `dropna` silencioso).
+- [X] FR-GS-06: Captura da data de última actualização via HTTP headers.
 - [ ] FR-GS-07/08: UI — sidebar permanente e dropdown de abas corrompidas.
-- [ ] Testar com workbook mock contendo abas válidas, corrompidas e vazias.
+- [X] Testar com workbook mock contendo abas válidas, corrompidas e vazias.
 
 ### Fase 3 — Módulo Sifarma
 **Módulo:** `sifarma.py`
 
-- [ ] FR-SF-01: Ingestão CSV com fallback de encoding.
-- [ ] FR-SF-02: Lógica de deduplicação PVF=0 (pré-análise).
-- [ ] FR-SF-03 a FR-SF-08: Seis funções de alerta, cada uma retornando um DataFrame limpo.
-- [ ] Verificar threshold de 10% no Alerta 2.
-- [ ] Cada função: puro Python, sem imports de Streamlit.
-- [ ] Substituir todos os exports CSV por `.xlsx` via `exporters.to_excel_bytes()`.
-- [ ] Actualizar label do botão "Em Falta" para "Gilda".
+- [X] FR-SF-01: Ingestão CSV com fallback de encoding.
+- [X] FR-SF-02: Lógica de deduplicação PVF=0 (pré-análise).
+- [X] FR-SF-03 a FR-SF-08: Seis funções de alerta, cada uma retornando um DataFrame limpo.
+- [X] Verificar threshold de 10% no Alerta 2.
+- [X] Cada função: puro Python, sem imports de Streamlit.
+- [X] Substituir todos os exports CSV por `.xlsx` via `exporters.to_excel_bytes()`.
+- [X] Actualizar label do botão "Em Falta" para "Gilda".
 
 ### Fase 4 — Módulo Infoprex
 **Módulo:** `infoprex.py`
 
-- [ ] FR-IP-01/02: Detecção de formato e delegação para `infoprex_new_system.py`.
-- [ ] FR-IP-03/04: Identificação dinâmica de linhas e filtro de localização.
-- [ ] FR-IP-05/06/07: Limpeza numérica, filtro SAC, cálculo de margem.
-- [ ] FR-IP-08: Filtros de UI (radio + toggle).
+- [X] FR-IP-01/02: Detecção de formato e delegação para `infoprex_new_system.py`.
+- [X] FR-IP-03/04: Identificação dinâmica de linhas e filtro de localização.
+- [X] FR-IP-05/06/07: Limpeza numérica, filtro SAC, cálculo de margem.
+- [X] FR-IP-08: Filtros de UI (radio + toggle).
 - [ ] FR-IP-09: Substituir `st.dataframe` por `st.data_editor` com `num_rows='dynamic'`.
 - [ ] FR-IP-10: Export `.xlsx` do estado editado (não do DataFrame original).
-- [ ] Testar com amostras de ambos os formatos.
+- [X] Testar com amostras de ambos os formatos.
 
 ### Fase 5 — Montagem da UI e Design System
 **Módulo:** `app.py` (reescrita completa) e `@design_system/design-system.html`
