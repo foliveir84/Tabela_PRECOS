@@ -496,13 +496,14 @@ Data injectada em runtime: `datetime.today().strftime('%Y%m%d')`.
 - [ ] FR-IP-10: Export `.xlsx` do estado editado (não do DataFrame original).
 - [ ] Testar com amostras de ambos os formatos.
 
-### Fase 5 — Montagem da UI
-**Módulo:** `app.py` (reescrita completa)
+### Fase 5 — Montagem da UI e Design System
+**Módulo:** `app.py` (reescrita completa) e `@design_system/design-system.html`
 
 - [ ] FR-UI-01: Auditoria de todos os strings; substituir por equivalentes pt-PT.
 - [ ] Ligar todos os seis alertas Sifarma com os respectivos botões `.xlsx`.
 - [ ] Ligar filtros Infoprex e exportação do estado editado.
 - [X] FR-SF-09: Verificar que o vídeo tutorial está preservado.
+- [ ] Aplicar o **Design System** estrito (`@design_system/design-system.html`) injetando as classes do Tailwind CSS, tipografia e ícones.
 - [ ] FR-UI-02/03: Validar layout do sidebar e padrão dos botões de download.
 
 ### Fase 6 — QA e Hardening
