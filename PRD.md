@@ -521,7 +521,7 @@ Data injectada em runtime: `datetime.today().strftime('%Y%m%d')`.
 - [X] Push para GitHub.
 - [X] Configurar `GOOGLE_SHEET_ID` nos Streamlit Community Cloud Secrets.
 - [X] Smoke-test no deployment cloud.
-- [ ] Actualizar `GEMINI.md` para reflectir a arquitectura v3.0.
+- [X] Actualizar `GEMINI.md` e `PRD.md` para reflectir a arquitectura v3.0.
 
 ---
 
