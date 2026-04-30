@@ -163,3 +163,29 @@ def compare_infoprex_master(df_infoprex: pd.DataFrame, final_df: pd.DataFrame) -
         return diff_pvp
     
     return merged_info
+
+def get_alert_infoprex_missing_pvp(df_infoprex: pd.DataFrame, df_invalid_pvp: pd.DataFrame) -> pd.DataFrame:
+    """
+    Alert: Products exist in Infoprex but PVP is missing or invalid in the Master Table.
+    """
+    if df_infoprex.empty or df_invalid_pvp.empty:
+        return pd.DataFrame()
+
+    df_info_clean = df_infoprex.copy()
+    df_info_clean['CNP'] = pd.to_numeric(df_info_clean['CNP'], errors='coerce')
+    df_info_clean = df_info_clean.dropna(subset=['CNP'])
+    df_info_clean['CNP'] = df_info_clean['CNP'].astype(int)
+
+    df_merged = pd.merge(df_info_clean, df_invalid_pvp, on='CNP', how='inner')
+
+    if df_merged.empty:
+        return pd.DataFrame()
+
+    df_alert = df_merged.rename(columns={
+        'PVP': 'PVP Infoprex'
+    })
+
+    cols_to_return = ['CNP', 'Descrição', 'Stock', 'PVP Infoprex', 'PVP Atual']
+    existing_cols = [c for c in cols_to_return if c in df_alert.columns]
+    
+    return df_alert[existing_cols]

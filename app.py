@@ -9,7 +9,7 @@ from sifarma import (
     get_alert_1_high_cost, get_alert_2_low_cost, get_alert_3_pvp_divergence,
     get_alert_4_missing_pc, get_alert_5_missing_pvp, get_alert_6_not_in_master
 )
-from infoprex import detect_format_and_read, process_infoprex_data, apply_ui_filters, compare_infoprex_master
+from infoprex import detect_format_and_read, process_infoprex_data, apply_ui_filters, compare_infoprex_master, get_alert_infoprex_missing_pvp
 from exporters import to_excel_bytes, get_export_filename
 
 # --- CONFIGURAÇÃO DA PÁGINA ---
@@ -252,8 +252,6 @@ with tab_infoprex:
                 ui_alert("Todos os produtos correspondidos têm o PVP correto!", "success")
             else:
                 col1, col2, col3 = st.columns([2, 0.8, 1.5])
-                with col1:
-                    ui_alert(f"Encontrados **{len(diff_pvp)}** produtos com PVP diferente.", "warning")
                 with col2:
                     filter_margin = st.toggle("Margem > 30%", value=False)
                 with col3:
@@ -267,22 +265,46 @@ with tab_infoprex:
                     tipo_param = "Todas"
 
                 final_view = apply_ui_filters(diff_pvp, tipo_param, filter_margin)
-                
+
+                with col1:
+                    ui_alert(f"Encontrados **{len(final_view)}** produtos com PVP diferente.", "warning")
+
                 show_cols = ['CNP', 'Descrição', 'Stock', 'PVP Atual', 'PVP_Infoprex', 'Margem']
                 display_df = final_view[show_cols].rename(columns={
                     'PVP Atual': 'PVP Mestra',
                     'PVP_Infoprex': 'PVP Infoprex',
                     'Margem': 'Margem (%)'
-                })
+                }).reset_index(drop=True)
 
+                # A opção num_rows='dynamic' do Streamlit força a exibição de uma coluna de índice especial
+                # para permitir a seleção/adição/eliminação de linhas.
                 edited_df = st.data_editor(display_df, width='stretch', hide_index=True, num_rows='dynamic')
-
+                
+                # Remover linhas vazias que o utilizador possa ter adicionado acidentalmente
+                export_df = edited_df.dropna(subset=['CNP', 'Descrição'], how='all')
+                
                 st.download_button(
                     label="📥 Descarregar Resultados (.xlsx)",
-                    data=to_excel_bytes(edited_df, "Infoprex"),
+                    data=to_excel_bytes(export_df, "Infoprex"),
                     file_name=get_export_filename("divergencias_infoprex"),
                     mime='application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'
                 )
+
+            # --- NOVO ALERTA: PVP em falta na Mestra ---
+            df_alert_pvp = get_alert_infoprex_missing_pvp(df_info_proc, df_invalid_pvp)
+            if not df_alert_pvp.empty:
+                st.divider()
+                st.markdown("### Produtos sem PVP na Tabela de Preços")
+                ui_alert(f"Tabela Mestra Incompleta — PVP Atual ({len(df_alert_pvp)} Produtos presentes no Infoprex)", "warning")
+                st.dataframe(df_alert_pvp, hide_index=True, width='stretch')
+                st.download_button(
+                    label="📥 Exportar Alerta PVP Inválido (.xlsx)", 
+                    data=to_excel_bytes(df_alert_pvp, "PVP Inválido"), 
+                    file_name=get_export_filename("alerta_infoprex_pvp_invalido"), 
+                    mime="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+                    key="btn_info_missing_pvp"
+                )
+            # -------------------------------------------
 
         except Exception as e:
             ui_alert(f"Erro ao processar ficheiro Infoprex: {e}", "error")
