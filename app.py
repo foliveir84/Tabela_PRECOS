@@ -179,10 +179,10 @@ with tab_sifarma:
 
     with st.expander("📖 Guia Rápido: Como interpretar os Alertas?"):
         st.markdown("""
-        * 🔴 **ALERTA CRÍTICO (Custo Superior):** O preço de compra (PVF) no Sifarma está pelo menos 1% acima do acordado na Tabela de Precos. **Ação:** Descarregar a tabela no botão \n e enviar para a Gilda para confirmar precos de compra.
+        * 🔴 **ALERTA CRÍTICO (Custo Superior):** O preço de compra (PVF) no Sifarma está pelo menos 1% acima do acordado na Tabela de Precos. **Ação:** Descarregar a tabela no botão  e enviar para a Gilda para confirmar precos de compra.
         * ⚠️ **ALERTA DE VERIFICAÇÃO (Custo Inferior):** O preço de compra está demasiado baixo (gap > 10%). **Ação:** Verificar se é um lapso na fatura se a tabela de preços estará actualizada.
         * 🔵 **INFORMATIVO (PVP Divergente):** O PVP no Sifarma não bate certo com o da Tabela Mestra. **Ação:** Atualizar o PVP no Sifarma para o valor correto.
-        * ⚠️ **TABELA MESTRA INCOMPLETA:** O produto existe na tabela de Precos, \n mas falta o PC Atual ou o PVP Atual na Tabela de Precos. **Ação:** Exportar o ficheiro correspondente e enviar à Gilda para correção.
+        * ⚠️ **TABELA MESTRA INCOMPLETA:** O produto existe na tabela de Precos,  mas falta o PC Atual ou o PVP Atual na Tabela de Precos. **Ação:** Exportar o ficheiro correspondente e enviar à Gilda para correção.
         """)
 
     with st.expander("🎥 Ver Tutorial: Como exportar o ficheiro?"):
