@@ -56,9 +56,27 @@ def detect_format_and_read(filepath_or_buffer) -> pd.DataFrame:
     if df is None or df.empty:
         return pd.DataFrame()
 
+    # Remove quotes from all columns
+    for col in df.columns:
+        df[col] = df[col].astype(str).str.replace('"', '', regex=False).str.strip()
+
+    # Apply location filtering
+    if 'DUV' in df.columns and 'LOCALIZACAO' in df.columns:
+        df['DUV_dt'] = pd.to_datetime(df['DUV'], dayfirst=True, errors='coerce')
+        valid_dates = df.dropna(subset=['DUV_dt'])
+        if not valid_dates.empty:
+            max_date = valid_dates['DUV_dt'].max()
+            rows_max_date = df[df['DUV_dt'] == max_date]
+            if not rows_max_date.empty:
+                localizacao_alvo = rows_max_date['LOCALIZACAO'].iloc[0]
+                df = df[df['LOCALIZACAO'] == localizacao_alvo].copy()
+        if 'DUV_dt' in df.columns:
+            df.drop(columns=['DUV_dt'], inplace=True)
+
     for c in ['PVP', 'PCU', 'IVA', 'SAC']:
         if c in df.columns:
-            df[c] = df[c].str.replace('"', '', regex=False).str.replace(',', '.', regex=False)
+            # quotes are already removed
+            df[c] = df[c].str.replace(',', '.', regex=False)
             df[c] = pd.to_numeric(df[c], errors='coerce').fillna(0.0)
 
     rename_dict = {
@@ -103,11 +121,11 @@ def apply_ui_filters(df: pd.DataFrame, divergence_type: str, margin_threshold: b
 
     # FR-IP-08: UI Filters
     if divergence_type == 'Infoprex < Master':
-        if 'PVP_Infoprex' in filtered_df.columns and 'PVP Actual' in filtered_df.columns:
-            filtered_df = filtered_df[filtered_df['PVP_Infoprex'] < filtered_df['PVP Actual']]
+        if 'PVP_Infoprex' in filtered_df.columns and 'PVP Atual' in filtered_df.columns:
+            filtered_df = filtered_df[filtered_df['PVP_Infoprex'] < filtered_df['PVP Atual']]
     elif divergence_type == 'Infoprex > Master':
-        if 'PVP_Infoprex' in filtered_df.columns and 'PVP Actual' in filtered_df.columns:
-            filtered_df = filtered_df[filtered_df['PVP_Infoprex'] > filtered_df['PVP Actual']]
+        if 'PVP_Infoprex' in filtered_df.columns and 'PVP Atual' in filtered_df.columns:
+            filtered_df = filtered_df[filtered_df['PVP_Infoprex'] > filtered_df['PVP Atual']]
 
     if margin_threshold:
         if 'Margem' in filtered_df.columns:
@@ -134,15 +152,14 @@ def compare_infoprex_master(df_infoprex: pd.DataFrame, final_df: pd.DataFrame) -
     merged_info = pd.merge(
         final_df,
         df_infoprex,
-        left_on='Codigo',
-        right_on='CNP',
+        on='CNP',
         how='inner'
     )
 
-    if 'PVP Actual' in merged_info.columns and 'PVP' in merged_info.columns:
-        merged_info['PVP Actual'] = pd.to_numeric(merged_info['PVP Actual'], errors='coerce').fillna(0).round(2)
+    if 'PVP Atual' in merged_info.columns and 'PVP' in merged_info.columns:
+        merged_info['PVP Atual'] = pd.to_numeric(merged_info['PVP Atual'], errors='coerce').fillna(0).round(2)
         merged_info['PVP_Infoprex'] = pd.to_numeric(merged_info['PVP'], errors='coerce').fillna(0).round(2)
-        diff_pvp = merged_info[merged_info['PVP Actual'] != merged_info['PVP_Infoprex']].copy()
+        diff_pvp = merged_info[merged_info['PVP Atual'] != merged_info['PVP_Infoprex']].copy()
         return diff_pvp
     
     return merged_info

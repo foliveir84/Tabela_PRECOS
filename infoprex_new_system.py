@@ -24,14 +24,21 @@ def transform_new_system(filepath_or_buffer) -> pd.DataFrame:
     if df is None or 'CPR' not in df.columns:
         return pd.DataFrame()
 
+    # Remove quotes from all columns
+    for col in df.columns:
+        df[col] = df[col].astype(str).str.replace('"', '', regex=False).str.strip()
+
     # FR-IP-03, FR-IP-04: Dynamic row identification and location filtering
-    df['DUV_dt'] = pd.to_datetime(df['DUV'], format='%d/%m/%Y', errors='coerce')
+    df['DUV_dt'] = pd.to_datetime(df['DUV'], dayfirst=True, errors='coerce')
     valid_dates = df.dropna(subset=['DUV_dt'])
     
     if not valid_dates.empty:
         max_date = valid_dates['DUV_dt'].max()
-        localizacao_alvo = df.loc[df['DUV_dt'] == max_date, 'LOCALIZACAO'].iloc[0]
-        df = df[df['LOCALIZACAO'] == localizacao_alvo].copy()
+        # Find rows with the max_date
+        rows_max_date = df[df['DUV_dt'] == max_date]
+        if not rows_max_date.empty:
+            localizacao_alvo = rows_max_date['LOCALIZACAO'].iloc[0]
+            df = df[df['LOCALIZACAO'] == localizacao_alvo].copy()
 
     # FR-IP-05: Clean numerical values
     for col in ['PVP', 'PCU', 'IVA']:

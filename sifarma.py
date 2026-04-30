@@ -158,12 +158,16 @@ def get_alert_5_missing_pvp(df_sifarma: pd.DataFrame, df_invalid_pvp_from_master
     
     return df_alert[['CNP', 'Descrição', 'PC Atual', 'PVF', 'PVP Sifarma', 'PVP Atual']]
 
-def get_alert_6_not_in_master(df_sifarma: pd.DataFrame, df_master: pd.DataFrame) -> pd.DataFrame:
+def get_alert_6_not_in_master(df_sifarma: pd.DataFrame, df_master: pd.DataFrame, df_invalid_pc: pd.DataFrame, df_invalid_pvp: pd.DataFrame) -> pd.DataFrame:
     """
-    Alert 6: CNP in Sifarma missing from Master.
+    Alert 6: CNP in Sifarma missing from Master entirely.
+    It should NOT trigger for CNPs that are in Master but have invalid PC/PVP.
+    It should ONLY trigger if the product in Sifarma has a valid PVP (> 0).
     Returns ONLY CNP, Descrição, PVF.
     """
-    mask = ~df_sifarma['CNP'].isin(df_master['CNP'])
+    all_master_cnps = pd.concat([df_master['CNP'], df_invalid_pc['CNP'], df_invalid_pvp['CNP']]).unique()
+    
+    mask = (~df_sifarma['CNP'].isin(all_master_cnps)) & (df_sifarma['pvp_sifarma'] > 0)
     df_alert = df_sifarma[mask].copy()
     
     df_alert = df_alert.rename(columns={

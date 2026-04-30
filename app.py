@@ -225,7 +225,7 @@ with tab_sifarma:
                 st.download_button("📥 Exportar Alerta PVP Inválido (.xlsx)", to_excel_bytes(df_a5, "PVP Inválido"), get_export_filename("alerta_pvp_invalido"), mime="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet")
 
             # Alert 6
-            df_a6 = get_alert_6_not_in_master(df_sifarma_clean, df_master)
+            df_a6 = get_alert_6_not_in_master(df_sifarma_clean, df_master, df_invalid_pc, df_invalid_pvp)
             if not df_a6.empty:
                 with st.expander(f"❓ {len(df_a6)} Produtos não encontrados na Tabela Mestra", expanded=True):
                     st.dataframe(df_a6, hide_index=True, width='stretch')
