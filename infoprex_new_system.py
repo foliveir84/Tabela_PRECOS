@@ -8,7 +8,8 @@ def transform_new_system(filepath_or_buffer) -> pd.DataFrame:
     # FR-IP-01: Memory Optimization
     colunas_alvo = ['CPR', 'NOM', 'LOCALIZACAO', 'SAC', 'PVP', 'PCU', 'IVA', 'DUV']
     
-    usecols_func = lambda x: x in colunas_alvo
+    def usecols_func(x):
+        return x in colunas_alvo
     
     df = None
     for enc in ['utf-16', 'utf-8', 'latin1']:

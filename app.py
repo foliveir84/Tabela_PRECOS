@@ -1,6 +1,4 @@
 import streamlit as st
-import pandas as pd
-import io
 import os
 
 from google_sheets import build_google_sheet_url, fetch_and_process_master_table

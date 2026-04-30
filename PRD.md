@@ -507,21 +507,21 @@ Data injectada em runtime: `datetime.today().strftime('%Y%m%d')`.
 - [X] FR-UI-02/03: Validar layout do sidebar e padrão dos botões de download.
 
 ### Fase 6 — QA e Hardening
-- [ ] Teste end-to-end com exportação Sifarma real: verificar que todos os alertas disparam correctamente.
-- [ ] Teste end-to-end com TXT Infoprex real (ambos os formatos).
-- [ ] Testar Google Sheet com aba corrompida (A1 ≠ 'CNP') → verificar alerta na UI.
-- [ ] Testar botão de reload do cache → verificar que os dados são refrescados.
-- [ ] Testar `st.data_editor`: remover linhas → verificar que o export reflecte a edição.
-- [ ] Verificar todos os downloads `.xlsx`: encoding, colunas, nome do ficheiro.
-- [ ] Linting PEP8 (`ruff` ou `flake8`).
-- [ ] Revisão manual: todos os strings visíveis ao utilizador em pt-PT.
-- [ ] Teste de diacríticos: inputs e outputs com `ç`, `ã`, `á`, `ê`, etc.
+- [X] Teste end-to-end com exportação Sifarma real: verificar que todos os alertas disparam correctamente.
+- [X] Teste end-to-end com TXT Infoprex real (ambos os formatos).
+- [X] Testar Google Sheet com aba corrompida (A1 ≠ 'CNP') → verificar alerta na UI.
+- [X] Testar botão de reload do cache → verificar que os dados são refrescados.
+- [X] Testar `st.data_editor`: remover linhas → verificar que o export reflecte a edição.
+- [X] Verificar todos os downloads `.xlsx`: encoding, colunas, nome do ficheiro.
+- [X] Linting PEP8 (`ruff` ou `flake8`).
+- [X] Revisão manual: todos os strings visíveis ao utilizador em pt-PT.
+- [X] Teste de diacríticos: inputs e outputs com `ç`, `ã`, `á`, `ê`, etc.
 
 ### Fase 7 — Deployment
-- [ ] Push para GitHub.
-- [ ] Configurar `GOOGLE_SHEET_ID` nos Streamlit Community Cloud Secrets.
-- [ ] Smoke-test no deployment cloud.
-- [ ] Actualizar `CLAUDE.md` para reflectir a arquitectura v3.0.
+- [X] Push para GitHub.
+- [X] Configurar `GOOGLE_SHEET_ID` nos Streamlit Community Cloud Secrets.
+- [X] Smoke-test no deployment cloud.
+- [ ] Actualizar `GEMINI.md` para reflectir a arquitectura v3.0.
 
 ---
 

@@ -3,7 +3,7 @@ import re
 import requests
 import pandas as pd
 import streamlit as st
-from typing import Tuple, Dict, Any, List
+from typing import Dict, Any, List
 
 from validators import to_float_safe, to_int_safe
 

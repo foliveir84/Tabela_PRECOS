@@ -73,11 +73,11 @@ def ler_ficheiro_infoprex(filepath, lista_cla=None, lista_codigos=None):
     colunas_vendas_esperadas = [f'V{i}' for i in range(15)]
     colunas_alvo = ['CPR', 'NOM', 'LOCALIZACAO', 'SAC', 'PVP', 'PCU', 'DUC', 'DTVAL', 'CLA', 'DUV'] + colunas_vendas_esperadas
 
-    # Função lambda para ler apenas as colunas se elas existirem no ficheiro (previne KeyError)
-    usecols_func = lambda x: x in colunas_alvo
+    # Função def para ler apenas as colunas se elas existirem no ficheiro (previne KeyError)
+    def usecols_func(x):
+        return x in colunas_alvo
 
-    try:
-        # Tenta ler com utf-16 (comum em exports de texto do Windows/Infoprex)
+    try:        # Tenta ler com utf-16 (comum em exports de texto do Windows/Infoprex)
         df = pd.read_csv(filepath, sep='\t', encoding='utf-16', usecols=usecols_func)
     except Exception:
         try:

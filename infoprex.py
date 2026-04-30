@@ -105,7 +105,11 @@ def process_infoprex_data(df: pd.DataFrame) -> pd.DataFrame:
         df['iva_divisor'] = 1 + (pd.to_numeric(df['IVA'], errors='coerce').fillna(0) / 100)
         df['PVP_sIVA'] = pd.to_numeric(df['PVP'], errors='coerce').fillna(0) / df['iva_divisor']
         pc_atual = pd.to_numeric(df['PC Atual'], errors='coerce').fillna(0)
-        df['Margem'] = ((df['PVP_sIVA'] - pc_atual) / df['PVP_sIVA'].replace(0, pd.NA) * 100).fillna(0)
+        
+        # Calculate margin, handling division by zero safely
+        with pd.option_context('future.no_silent_downcasting', True):
+            df['Margem'] = ((df['PVP_sIVA'] - pc_atual) / df['PVP_sIVA'].replace(0, pd.NA)).fillna(0).infer_objects(copy=False) * 100
+        
         df['Margem'] = pd.to_numeric(df['Margem'], errors='coerce').round(1)
 
     return df
