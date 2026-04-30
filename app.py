@@ -3,7 +3,7 @@ import os
 
 from google_sheets import build_google_sheet_url, fetch_and_process_master_table
 from sifarma import (
-    read_sifarma_csv, deduplicate_sifarma_data, 
+    read_sifarma_csv, deduplicate_sifarma_data,
     get_alert_1_high_cost, get_alert_2_low_cost, get_alert_3_pvp_divergence,
     get_alert_4_missing_pc, get_alert_5_missing_pvp, get_alert_6_not_in_master
 )
@@ -11,9 +11,12 @@ from infoprex import detect_format_and_read, process_infoprex_data, apply_ui_fil
 from exporters import to_excel_bytes, get_export_filename
 
 # --- CONFIGURAÇÃO DA PÁGINA ---
-st.set_page_config(page_title="Verificador de Preços", page_icon="💊", layout="wide")
+st.set_page_config(page_title="Verificador de Preços",
+                   page_icon="💊", layout="wide")
 
 # --- DESIGN SYSTEM ---
+
+
 def inject_design_system():
     st.markdown("""
     <script src="https://cdn.tailwindcss.com/"></script>
@@ -49,6 +52,7 @@ def inject_design_system():
     </style>
     """, unsafe_allow_html=True)
 
+
 def ui_alert(message, alert_type="info", icon=None):
     if not icon:
         icons = {
@@ -58,7 +62,7 @@ def ui_alert(message, alert_type="info", icon=None):
             "success": "lucide:check-circle-2"
         }
         icon = icons.get(alert_type, "lucide:info")
-    
+
     html = f"""
     <div class="nf-alert nf-alert-{alert_type}">
         <iconify-icon icon="{icon}" class="text-xl"></iconify-icon>
@@ -66,6 +70,7 @@ def ui_alert(message, alert_type="info", icon=None):
     </div>
     """
     st.markdown(html, unsafe_allow_html=True)
+
 
 def ui_header(title, subtitle=None, icon="lucide:layers"):
     html = f"""
@@ -80,6 +85,7 @@ def ui_header(title, subtitle=None, icon="lucide:layers"):
     </div>
     """
     st.markdown(html, unsafe_allow_html=True)
+
 
 def ui_sidebar_status(version="1.0.0", last_updated="Ainda não carregada", total_products=0):
     html = f"""
@@ -110,7 +116,8 @@ def ui_sidebar_status(version="1.0.0", last_updated="Ainda não carregada", tota
 inject_design_system()
 
 # --- UI PRINCIPAL ---
-ui_header("Verificador de Preços Farmácia", "Análise e correspondência de preços (Sifarma & Infoprex)")
+ui_header("Verificador de Preços Farmácia",
+          "Análise e correspondência de preços (Sifarma & Infoprex)")
 
 sheet_id = None
 if "GOOGLE_SHEET_ID" in st.secrets:
@@ -121,10 +128,12 @@ elif "GOOGLE_SHEET_ID" in os.environ:
 if not sheet_id:
     with st.sidebar:
         ui_alert("ID da Google Sheet não configurado.", "warning")
-        sheet_id = st.text_input("Introduza o ID da Google Sheet (ou parte 2PACX...):")
+        sheet_id = st.text_input(
+            "Introduza o ID da Google Sheet (ou parte 2PACX...):")
 
 if not sheet_id:
-    ui_alert("Por favor, configure o ID da Google Sheet nas 'Secrets' ou introduza-o na barra lateral.", "info", "lucide:arrow-left-circle")
+    ui_alert("Por favor, configure o ID da Google Sheet nas 'Secrets' ou introduza-o na barra lateral.",
+             "info", "lucide:arrow-left-circle")
     st.stop()
 
 sheet_url = build_google_sheet_url(sheet_id)
@@ -144,12 +153,14 @@ with st.status("A ligar à Tabela de Preços Mestra...", expanded=False) as stat
         df_invalid_pvp = master_data['df_invalid_pvp']
         corrupt_sheets = master_data['corrupt_sheets']
         last_updated = master_data['last_updated']
-        
-        status.update(label="✅ Tabela Mestra Carregada", state="complete", expanded=False)
-        
+
+        status.update(label="✅ Tabela Mestra Carregada",
+                      state="complete", expanded=False)
+
         with st.sidebar:
-            ui_sidebar_status(version="1.1.0", last_updated=last_updated, total_products=len(df_master))
-            
+            ui_sidebar_status(
+                version="1.1.0", last_updated=last_updated, total_products=len(df_master))
+
     except Exception as e:
         status.update(label="❌ Erro ao carregar Tabela Mestra", state="error")
         ui_alert(f"Erro: {e}", "error")
@@ -165,95 +176,131 @@ tab_sifarma, tab_infoprex = st.tabs(["Sifarma (CSV)", "Infoprex (TXT)"])
 # === TAB 1: SIFARMA ===
 with tab_sifarma:
     st.markdown("### 1. Carregar Dados Sifarma")
-    
+
+    with st.expander("📖 Guia Rápido: Como interpretar os Alertas?"):
+        st.markdown("""
+        * 🔴 **ALERTA CRÍTICO (Custo Superior):** O preço de compra (PVF) no Sifarma está pelo menos 1% acima do acordado na Tabela de Precos. **Ação:** Descarregar a tabela no botão \n e enviar para a Gilda para confirmar precos de compra.
+        * ⚠️ **ALERTA DE VERIFICAÇÃO (Custo Inferior):** O preço de compra está demasiado baixo (gap > 10%). **Ação:** Verificar se é um lapso na fatura se a tabela de preços estará actualizada.
+        * 🔵 **INFORMATIVO (PVP Divergente):** O PVP no Sifarma não bate certo com o da Tabela Mestra. **Ação:** Atualizar o PVP no Sifarma para o valor correto.
+        * ⚠️ **TABELA MESTRA INCOMPLETA:** O produto existe na tabela de Precos, \n mas falta o PC Atual ou o PVP Atual na Tabela de Precos. **Ação:** Exportar o ficheiro correspondente e enviar à Gilda para correção.
+        """)
+
     with st.expander("🎥 Ver Tutorial: Como exportar o ficheiro?"):
         video_file = "ExportarFicheiro.mp4"
         if os.path.exists(video_file):
             st.video(video_file)
         else:
-            ui_alert(f"Vídeo '{video_file}' não encontrado na pasta.", "warning")
+            ui_alert(
+                f"Vídeo '{video_file}' não encontrado na pasta.", "warning")
 
-    uploaded_file = st.file_uploader("Carregar ficheiro Sifarma", type=['csv'], help="Certifique-se de que o separador é ';'", label_visibility="collapsed")
+    uploaded_file = st.file_uploader("Carregar ficheiro Sifarma", type=[
+                                     'csv'], help="Certifique-se de que o separador é ';'", label_visibility="collapsed")
 
     if uploaded_file is not None:
         try:
             df_sifarma = read_sifarma_csv(uploaded_file)
-            df_sifarma_clean, critical_errors = deduplicate_sifarma_data(df_sifarma)
-            
+            df_sifarma_clean, critical_errors = deduplicate_sifarma_data(
+                df_sifarma)
+
             st.divider()
             st.markdown("### 2. Resultados da Análise")
-            
+
             if critical_errors:
-                ui_alert(f"Erro Crítico: {len(critical_errors)} Linha(s) de bónus sem desconto 100% registado no Sifarma (PVF=0).", "error")
+                ui_alert(
+                    f"Erro Crítico: {len(critical_errors)} Linha(s) de bónus sem desconto 100% registado no Sifarma (PVF=0).", "error")
                 st.dataframe(critical_errors, width='stretch')
 
             # Alert 1
             df_a1 = get_alert_1_high_cost(df_sifarma_clean, df_master)
             if not df_a1.empty:
-                ui_alert(f"ALERTA CRÍTICO: {len(df_a1)} Produtos com PVF SUPERIOR ao previsto", "error")
+                ui_alert(
+                    f"ALERTA CRÍTICO: {len(df_a1)} Produtos com PVF SUPERIOR ao previsto", "error")
                 st.dataframe(df_a1, hide_index=True, width='stretch')
-                st.download_button("📥 Exportar Alerta Custo Superior (.xlsx)", to_excel_bytes(df_a1, "Custo Superior"), get_export_filename("alerta_pvf_superior"), mime="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet")
+                st.download_button("📥 Exportar Alerta Custo Superior (.xlsx)", to_excel_bytes(df_a1, "Custo Superior"), get_export_filename(
+                    "alerta_pvf_superior"), mime="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet")
 
             # Alert 2
             df_a2 = get_alert_2_low_cost(df_sifarma_clean, df_master)
             if not df_a2.empty:
-                ui_alert(f"ALERTA DE VERIFICAÇÃO: {len(df_a2)} Produtos com PVF MUITO INFERIOR (>10%)", "warning")
+                ui_alert(
+                    f"ALERTA DE VERIFICAÇÃO: {len(df_a2)} Produtos com PVF MUITO INFERIOR (>10%)", "warning")
                 st.dataframe(df_a2, hide_index=True, width='stretch')
-                st.download_button("📥 Exportar Alerta Custo Inferior (.xlsx)", to_excel_bytes(df_a2, "Custo Inferior"), get_export_filename("alerta_pvf_inferior"), mime="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet")
+                st.download_button("📥 Exportar Alerta Custo Inferior (.xlsx)", to_excel_bytes(df_a2, "Custo Inferior"), get_export_filename(
+                    "alerta_pvf_inferior"), mime="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet")
 
             # Alert 3
             df_a3 = get_alert_3_pvp_divergence(df_sifarma_clean, df_master)
             if not df_a3.empty:
-                ui_alert(f"PVP a Atualizar: {len(df_a3)} Produtos", "info", "lucide:refresh-cw")
+                ui_alert(
+                    f"PVP a Atualizar: {len(df_a3)} Produtos", "info", "lucide:refresh-cw")
                 st.dataframe(df_a3, hide_index=True, width='stretch')
-                st.download_button("📥 Exportar Alerta PVP Divergente (.xlsx)", to_excel_bytes(df_a3, "PVP Divergente"), get_export_filename("alerta_pvp_divergente"), mime="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet")
+                st.download_button("📥 Exportar Alerta PVP Divergente (.xlsx)", to_excel_bytes(df_a3, "PVP Divergente"), get_export_filename(
+                    "alerta_pvp_divergente"), mime="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet")
 
             # Alert 4
             df_a4 = get_alert_4_missing_pc(df_sifarma_clean, df_invalid_pc)
             if not df_a4.empty:
-                ui_alert(f"Tabela Mestra Incompleta — PC Atual ({len(df_a4)} Produtos)", "warning")
+                ui_alert(
+                    f"Tabela Mestra Incompleta — PC Atual ({len(df_a4)} Produtos)", "warning")
                 st.dataframe(df_a4, hide_index=True, width='stretch')
-                st.download_button("📥 Exportar Alerta PC Inválido (.xlsx)", to_excel_bytes(df_a4, "PC Inválido"), get_export_filename("alerta_pc_invalido"), mime="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet")
+                st.download_button("📥 Exportar Alerta PC Inválido (.xlsx)", to_excel_bytes(df_a4, "PC Inválido"), get_export_filename(
+                    "alerta_pc_invalido"), mime="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet")
 
             # Alert 5
             df_a5 = get_alert_5_missing_pvp(df_sifarma_clean, df_invalid_pvp)
             if not df_a5.empty:
-                ui_alert(f"Tabela Mestra Incompleta — PVP Atual ({len(df_a5)} Produtos)", "warning")
+                ui_alert(
+                    f"Tabela Mestra Incompleta — PVP Atual ({len(df_a5)} Produtos)", "warning")
                 st.dataframe(df_a5, hide_index=True, width='stretch')
-                st.download_button("📥 Exportar Alerta PVP Inválido (.xlsx)", to_excel_bytes(df_a5, "PVP Inválido"), get_export_filename("alerta_pvp_invalido"), mime="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet")
+                st.download_button("📥 Exportar Alerta PVP Inválido (.xlsx)", to_excel_bytes(df_a5, "PVP Inválido"), get_export_filename(
+                    "alerta_pvp_invalido"), mime="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet")
 
             # Alert 6
-            df_a6 = get_alert_6_not_in_master(df_sifarma_clean, df_master, df_invalid_pc, df_invalid_pvp)
+            df_a6 = get_alert_6_not_in_master(
+                df_sifarma_clean, df_master, df_invalid_pc, df_invalid_pvp)
             if not df_a6.empty:
                 with st.expander(f"❓ {len(df_a6)} Produtos não encontrados na Tabela Mestra", expanded=True):
                     st.dataframe(df_a6, hide_index=True, width='stretch')
-                    st.download_button("📥 Exportar Produtos em Falta (.xlsx)", to_excel_bytes(df_a6, "Em Falta"), get_export_filename("produtos_em_falta_tabela"), mime="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet")
+                    st.download_button("📥 Exportar Produtos em Falta (.xlsx)", to_excel_bytes(df_a6, "Em Falta"), get_export_filename(
+                        "produtos_em_falta_tabela"), mime="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet")
 
         except Exception as e:
             ui_alert(f"Erro ao processar ficheiro Sifarma: {e}", "error")
 
 # === TAB 2: INFOPREX ===
 with tab_infoprex:
-    st.markdown("### Comparação Infoprex vs Tabela Mestra")
-    
-    uploaded_infoprex = st.file_uploader("Carregar ficheiro Infoprex", type=['txt', 'csv', 'tsv'], key="infoprex_uploader", label_visibility="collapsed")
+    st.markdown("### Comparação Infoprex vs Tabela de Precos")
+
+    with st.expander("📖 Guia Rápido: Como usar esta tabela?"):
+        st.markdown("""
+        * É possível importar o Infoprex do Sifarma 2000 ou do Novo Módulo            
+                    
+        * 📊 A tabela exibe apenas divergências para produtos **que tenham stock ativo** (>0).
+        * 🗑️ **Excluir linhas:** Pode selecionar os produtos que não quer incluir na exportação final, clicando nos pequenos quadrados à esquerda, e pressionar a tecla `Delete` (ou `Backspace`) no seu teclado.
+        * 📥 **Exportação Exata:** O ficheiro Excel gerado pelo botão Descarregar vai respeitar **estritamente** os filtros ativos e as eliminações manuais que tenha feito na grelha no ecrã.
+        """)
+
+    uploaded_infoprex = st.file_uploader("Carregar ficheiro Infoprex", type=[
+                                         'txt', 'csv', 'tsv'], key="infoprex_uploader", label_visibility="collapsed")
 
     if uploaded_infoprex:
         try:
             df_info_raw = detect_format_and_read(uploaded_infoprex)
             df_info_proc = process_infoprex_data(df_info_raw)
             diff_pvp = compare_infoprex_master(df_info_proc, df_master)
-            
+
             st.divider()
-            
+
             if diff_pvp.empty:
-                ui_alert("Todos os produtos correspondidos têm o PVP correto!", "success")
+                ui_alert(
+                    "Todos os produtos correspondidos têm o PVP correto!", "success")
             else:
                 col1, col2, col3 = st.columns([2, 0.8, 1.5])
                 with col2:
                     filter_margin = st.toggle("Margem > 30%", value=False)
                 with col3:
-                    filter_tipo = st.radio("Filtro de Divergência:", ["Todas", "Infoprex < Mestra", "Infoprex > Mestra"], horizontal=True)
+                    filter_tipo = st.radio("Filtro de Divergência:", [
+                                           "Todas", "Infoprex < Mestra", "Infoprex > Mestra"], horizontal=True)
 
                 if filter_tipo == "Infoprex < Mestra":
                     tipo_param = "Infoprex < Master"
@@ -262,12 +309,15 @@ with tab_infoprex:
                 else:
                     tipo_param = "Todas"
 
-                final_view = apply_ui_filters(diff_pvp, tipo_param, filter_margin)
+                final_view = apply_ui_filters(
+                    diff_pvp, tipo_param, filter_margin)
 
                 with col1:
-                    ui_alert(f"Encontrados **{len(final_view)}** produtos com PVP diferente.", "warning")
+                    ui_alert(
+                        f"Encontrados **{len(final_view)}** produtos com PVP diferente.", "warning")
 
-                show_cols = ['CNP', 'Descrição', 'Stock', 'PVP Atual', 'PVP_Infoprex', 'Margem']
+                show_cols = ['CNP', 'Descrição', 'Stock',
+                             'PVP Atual', 'PVP_Infoprex', 'Margem']
                 display_df = final_view[show_cols].rename(columns={
                     'PVP Atual': 'PVP Mestra',
                     'PVP_Infoprex': 'PVP Infoprex',
@@ -276,11 +326,13 @@ with tab_infoprex:
 
                 # A opção num_rows='dynamic' do Streamlit força a exibição de uma coluna de índice especial
                 # para permitir a seleção/adição/eliminação de linhas.
-                edited_df = st.data_editor(display_df, width='stretch', hide_index=True, num_rows='dynamic')
-                
+                edited_df = st.data_editor(
+                    display_df, width='stretch', hide_index=True, num_rows='dynamic')
+
                 # Remover linhas vazias que o utilizador possa ter adicionado acidentalmente
-                export_df = edited_df.dropna(subset=['CNP', 'Descrição'], how='all')
-                
+                export_df = edited_df.dropna(
+                    subset=['CNP', 'Descrição'], how='all')
+
                 st.download_button(
                     label="📥 Descarregar Resultados (.xlsx)",
                     data=to_excel_bytes(export_df, "Infoprex"),
@@ -289,16 +341,19 @@ with tab_infoprex:
                 )
 
             # --- NOVO ALERTA: PVP em falta na Mestra ---
-            df_alert_pvp = get_alert_infoprex_missing_pvp(df_info_proc, df_invalid_pvp)
+            df_alert_pvp = get_alert_infoprex_missing_pvp(
+                df_info_proc, df_invalid_pvp)
             if not df_alert_pvp.empty:
                 st.divider()
                 st.markdown("### Produtos sem PVP na Tabela de Preços")
-                ui_alert(f"Tabela Mestra Incompleta — PVP Atual ({len(df_alert_pvp)} Produtos presentes no Infoprex)", "warning")
+                ui_alert(
+                    f"Tabela Mestra Incompleta — PVP Atual ({len(df_alert_pvp)} Produtos presentes no Infoprex)", "warning")
                 st.dataframe(df_alert_pvp, hide_index=True, width='stretch')
                 st.download_button(
-                    label="📥 Exportar Alerta PVP Inválido (.xlsx)", 
-                    data=to_excel_bytes(df_alert_pvp, "PVP Inválido"), 
-                    file_name=get_export_filename("alerta_infoprex_pvp_invalido"), 
+                    label="📥 Exportar Alerta PVP Inválido (.xlsx)",
+                    data=to_excel_bytes(df_alert_pvp, "PVP Inválido"),
+                    file_name=get_export_filename(
+                        "alerta_infoprex_pvp_invalido"),
                     mime="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
                     key="btn_info_missing_pvp"
                 )
