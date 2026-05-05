@@ -263,6 +263,10 @@ with tab_sifarma:
                     st.dataframe(df_a6, hide_index=True, width='stretch')
                     st.download_button("📥 Exportar Produtos em Falta (.xlsx)", to_excel_bytes(df_a6, "Em Falta"), get_export_filename(
                         "produtos_em_falta_tabela"), mime="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet")
+            
+            # Success Alert (No discrepancies)
+            if not critical_errors and df_a1.empty and df_a2.empty and df_a3.empty and df_a4.empty and df_a5.empty and df_a6.empty:
+                ui_alert("Tudo está correto! Não foram encontradas divergências entre o Sifarma e a Tabela de Preços.", "success")
 
         except Exception as e:
             ui_alert(f"Erro ao processar ficheiro Sifarma: {e}", "error")

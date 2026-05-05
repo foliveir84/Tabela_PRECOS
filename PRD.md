@@ -250,6 +250,12 @@ A deduplicação compara **apenas a coluna CNP** — as restantes colunas podem 
 #### FR-SF-09 — Vídeo Tutorial
 O bloco expansível "🎥 Ver Tutorial: Como exportar o ficheiro?" com o vídeo `ExportarFicheiro.mp4` deve ser preservado. Se o ficheiro não existir, exibir aviso gracioso — nunca lançar excepção.
 
+#### FR-SF-10 — Alerta de Sucesso (Sem Divergências)
+- Condição: Nenhuma divergência ou erro foi encontrado em nenhum dos alertas anteriores (`df_a1` até `df_a6` vazios e sem erros críticos de `PVF=0`).
+- Severidade: ✅ Sucesso (`ui_alert` com tipo `success`)
+- Mensagem: "Tudo está correto! Não foram encontradas divergências entre o Sifarma e a Tabela de Preços." ou texto similar apropriado.
+- Display: Alerta a verde informando o utilizador de que a validação foi concluída com sucesso.
+
 ---
 
 ### 4.3 Module: Infoprex Upload Processing

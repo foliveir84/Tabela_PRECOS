@@ -20,6 +20,7 @@ Alertas implementados:
 - **Alerta 3 (Divergência PVP):** `PVP_Sifarma != PVP_Mestre`
 - **Alerta 4 & 5 (Tabela Mestra Incompleta):** CNP presente mas com PC ou PVP inválido/inexistente.
 - **Alerta 6 (Não Encontrados):** Produtos existentes no Sifarma mas omissos da Tabela Mestra.
+- **Sucesso (Sem Divergências):** Se o ficheiro for processado e não existirem divergências em nenhum dos alertas anteriores, o sistema exibe uma mensagem de sucesso a verde.
 
 ## 3. Módulo Infoprex (Ficheiro TXT)
 
