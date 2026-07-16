@@ -1,4 +1,5 @@
 import streamlit as st
+import traceback
 import os
 
 from google_sheets import build_google_sheet_url, fetch_and_process_master_table
@@ -269,7 +270,7 @@ with tab_sifarma:
                 ui_alert("Tudo está correto! Não foram encontradas divergências entre o Sifarma e a Tabela de Preços.", "success")
 
         except Exception as e:
-            ui_alert(f"Erro ao processar ficheiro Sifarma: {e}", "error")
+            ui_alert(f"Erro ao processar ficheiro Sifarma: {e}\n\n{traceback.format_exc()}", "error")
 
 # === TAB 2: INFOPREX ===
 with tab_infoprex:
