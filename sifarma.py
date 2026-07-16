@@ -42,6 +42,7 @@ def read_sifarma_csv(filepath_or_buffer) -> pd.DataFrame:
         
     df = df[cols_to_keep].rename(columns=rename_map)
     
+    df['CNP'] = df['CNP'].astype(str).str.strip()
     df['CNP'] = pd.to_numeric(df['CNP'], errors='coerce')
     df = df.dropna(subset=['CNP'])
     df['CNP'] = df['CNP'].astype(int)
