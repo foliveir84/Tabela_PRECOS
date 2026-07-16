@@ -1,5 +1,4 @@
 import streamlit as st
-import traceback
 import os
 
 from google_sheets import build_google_sheet_url, fetch_and_process_master_table
@@ -209,14 +208,14 @@ with tab_sifarma:
             if critical_errors:
                 ui_alert(
                     f"Erro Crítico: {len(critical_errors)} Linha(s) de bónus sem desconto 100% registado no Sifarma (PVF=0).", "error")
-                st.dataframe(critical_errors, width='stretch')
+                st.dataframe(critical_errors, use_container_width=True)
 
             # Alert 1
             df_a1 = get_alert_1_high_cost(df_sifarma_clean, df_master)
             if not df_a1.empty:
                 ui_alert(
                     f"ALERTA CRÍTICO: {len(df_a1)} Produtos com PVF SUPERIOR ao previsto", "error")
-                st.dataframe(df_a1, hide_index=True, width='stretch')
+                st.dataframe(df_a1, hide_index=True, use_container_width=True)
                 st.download_button("📥 Exportar Alerta Custo Superior (.xlsx)", to_excel_bytes(df_a1, "Custo Superior"), get_export_filename(
                     "alerta_pvf_superior"), mime="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet")
 
@@ -225,7 +224,7 @@ with tab_sifarma:
             if not df_a2.empty:
                 ui_alert(
                     f"ALERTA DE VERIFICAÇÃO: {len(df_a2)} Produtos com PVF MUITO INFERIOR (>10%)", "warning")
-                st.dataframe(df_a2, hide_index=True, width='stretch')
+                st.dataframe(df_a2, hide_index=True, use_container_width=True)
                 st.download_button("📥 Exportar Alerta Custo Inferior (.xlsx)", to_excel_bytes(df_a2, "Custo Inferior"), get_export_filename(
                     "alerta_pvf_inferior"), mime="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet")
 
@@ -234,7 +233,7 @@ with tab_sifarma:
             if not df_a3.empty:
                 ui_alert(
                     f"PVP a Atualizar: {len(df_a3)} Produtos", "info", "lucide:refresh-cw")
-                st.dataframe(df_a3, hide_index=True, width='stretch')
+                st.dataframe(df_a3, hide_index=True, use_container_width=True)
                 st.download_button("📥 Exportar Alerta PVP Divergente (.xlsx)", to_excel_bytes(df_a3, "PVP Divergente"), get_export_filename(
                     "alerta_pvp_divergente"), mime="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet")
 
@@ -243,7 +242,7 @@ with tab_sifarma:
             if not df_a4.empty:
                 ui_alert(
                     f"Tabela Mestra Incompleta — PC Atual ({len(df_a4)} Produtos)", "warning")
-                st.dataframe(df_a4, hide_index=True, width='stretch')
+                st.dataframe(df_a4, hide_index=True, use_container_width=True)
                 st.download_button("📥 Exportar Alerta PC Inválido (.xlsx)", to_excel_bytes(df_a4, "PC Inválido"), get_export_filename(
                     "alerta_pc_invalido"), mime="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet")
 
@@ -252,7 +251,7 @@ with tab_sifarma:
             if not df_a5.empty:
                 ui_alert(
                     f"Tabela Mestra Incompleta — PVP Atual ({len(df_a5)} Produtos)", "warning")
-                st.dataframe(df_a5, hide_index=True, width='stretch')
+                st.dataframe(df_a5, hide_index=True, use_container_width=True)
                 st.download_button("📥 Exportar Alerta PVP Inválido (.xlsx)", to_excel_bytes(df_a5, "PVP Inválido"), get_export_filename(
                     "alerta_pvp_invalido"), mime="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet")
 
@@ -261,7 +260,7 @@ with tab_sifarma:
                 df_sifarma_clean, df_master, df_invalid_pc, df_invalid_pvp)
             if not df_a6.empty:
                 with st.expander(f"❓ {len(df_a6)} Produtos não encontrados na Tabela Mestra", expanded=True):
-                    st.dataframe(df_a6, hide_index=True, width='stretch')
+                    st.dataframe(df_a6, hide_index=True, use_container_width=True)
                     st.download_button("📥 Exportar Produtos em Falta (.xlsx)", to_excel_bytes(df_a6, "Em Falta"), get_export_filename(
                         "produtos_em_falta_tabela"), mime="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet")
             
@@ -270,7 +269,7 @@ with tab_sifarma:
                 ui_alert("Tudo está correto! Não foram encontradas divergências entre o Sifarma e a Tabela de Preços.", "success")
 
         except Exception as e:
-            ui_alert(f"Erro ao processar ficheiro Sifarma: {e}\n\n{traceback.format_exc()}", "error")
+            ui_alert(f"Erro ao processar ficheiro Sifarma: {e}", "error")
 
 # === TAB 2: INFOPREX ===
 with tab_infoprex:
@@ -332,7 +331,7 @@ with tab_infoprex:
                 # A opção num_rows='dynamic' do Streamlit força a exibição de uma coluna de índice especial
                 # para permitir a seleção/adição/eliminação de linhas.
                 edited_df = st.data_editor(
-                    display_df, width='stretch', hide_index=True, num_rows='dynamic')
+                    display_df, use_container_width=True, hide_index=True, num_rows='dynamic')
 
                 # Remover linhas vazias que o utilizador possa ter adicionado acidentalmente
                 export_df = edited_df.dropna(
@@ -353,7 +352,7 @@ with tab_infoprex:
                 st.markdown("### Produtos sem PVP na Tabela de Preços")
                 ui_alert(
                     f"Tabela Mestra Incompleta — PVP Atual ({len(df_alert_pvp)} Produtos presentes no Infoprex)", "warning")
-                st.dataframe(df_alert_pvp, hide_index=True, width='stretch')
+                st.dataframe(df_alert_pvp, hide_index=True, use_container_width=True)
                 st.download_button(
                     label="📥 Exportar Alerta PVP Inválido (.xlsx)",
                     data=to_excel_bytes(df_alert_pvp, "PVP Inválido"),
