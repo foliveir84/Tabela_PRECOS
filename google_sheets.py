@@ -1,5 +1,6 @@
 import io
 import re
+import warnings
 import requests
 import pandas as pd
 import streamlit as st
@@ -39,7 +40,9 @@ def fetch_and_process_master_table(url: str) -> Dict[str, Any]:
     corrupt_sheets: List[str] = []
     valid_dfs = []
     
-    xls = pd.ExcelFile(io.BytesIO(response.content))
+    with warnings.catch_warnings():
+        warnings.simplefilter("ignore")
+        xls = pd.ExcelFile(io.BytesIO(response.content))
     
     pc_regex = re.compile(r'^pc\s*(atual|actual)$', re.IGNORECASE)
     pvp_regex = re.compile(r'^pvp\s*(atual|actual)$', re.IGNORECASE)
